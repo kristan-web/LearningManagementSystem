@@ -70,4 +70,22 @@ class Assignment extends Model
             ->whereHas('schedule', fn (Builder $q) => $q->where('teacher_id', $teacherId))
             ->whereNotNull('due_date');
     }
+
+    /**
+     * Assignments belonging to any of the given teacher's schedules — feeds the
+     * teacher assignment index. Mirrors LearningMaterial::forTeacher().
+     */
+    public function scopeForTeacher(Builder $query, int $teacherId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('teacher_id', $teacherId));
+    }
+
+    /**
+     * Assignments belonging to schedules in the given section — feeds the student
+     * assignment index. Mirrors LearningMaterial::visibleToSection().
+     */
+    public function scopeVisibleToSection(Builder $query, int $sectionId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('section_id', $sectionId));
+    }
 }
