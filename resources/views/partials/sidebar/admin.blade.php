@@ -5,11 +5,11 @@
 
    $linkBase = 'sb-link group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200';
    $linkIdle = 'text-slate-600 hover:bg-white/80 hover:text-blue-700 hover:shadow-sm dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white';
-   $linkActive = 'bg-white text-blue-700 shadow-sm ring-1 ring-blue-100 dark:bg-blue-500/15 dark:text-white dark:ring-blue-400/20';
+   $linkActive = 'bg-white text-blue-700 shadow-md shadow-blue-900/5 ring-1 ring-blue-100 dark:bg-blue-500/15 dark:text-white dark:shadow-none dark:ring-blue-400/20 before:absolute before:-left-3 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-linear-to-b before:from-sky-400 before:to-blue-600';
    $iconBase = 'shrink-0 w-5 h-5 transition-transform duration-200 group-hover:scale-110';
    $subLink = 'relative flex items-center rounded-lg py-2 pl-11 pr-3 text-sm transition-colors duration-200 before:absolute before:left-[1.35rem] before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full before:transition-colors';
    $subIdle = 'text-slate-500 hover:bg-white/60 hover:text-blue-700 before:bg-slate-300 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white dark:before:bg-slate-600';
-   $subActive = 'font-medium text-blue-700 before:bg-blue-600 dark:text-white dark:before:bg-blue-400';
+   $subActive = 'font-medium text-blue-700 bg-white/60 before:bg-blue-600 before:ring-4 before:ring-blue-100 dark:bg-white/5 dark:text-white dark:before:bg-blue-400 dark:before:ring-blue-400/20';
 
    $isActive = fn (...$patterns) => request()->is(...$patterns);
    $academicActive = $isActive('admin/curriculum*', 'admin/school-year*', 'admin/enrollment*');
@@ -18,7 +18,7 @@
 <style>
    /* Labels, headings and submenus fold away when the sidebar is collapsed (desktop only). */
    .sb-label { max-width: 12rem; opacity: 1; transition: max-width .3s ease, opacity .2s ease; overflow: hidden; white-space: nowrap; }
-   .sb-tip { display: none; }
+   .sb-tip, .sb-show { display: none; }
 
    @media (min-width: 640px) {
       body:has(#separator-sidebar) .sm\:ml-64 { transition: margin-left .3s cubic-bezier(.4, 0, .2, 1); }
@@ -30,10 +30,11 @@
       #separator-sidebar[data-collapsed="true"] { width: 5rem; }
       #separator-sidebar[data-collapsed="true"] .sb-label { max-width: 0; opacity: 0; }
       #separator-sidebar[data-collapsed="true"] .sb-hide { display: none; }
+      #separator-sidebar[data-collapsed="true"] .sb-show { display: block; }
       #separator-sidebar[data-collapsed="true"] .sb-link { justify-content: center; gap: 0; padding-inline: 0; }
       #separator-sidebar[data-collapsed="true"] .sb-heading { max-height: 0; opacity: 0; margin: 0; padding: 0; }
       #separator-sidebar[data-collapsed="true"] .sb-nav { overflow: visible; }
-      #separator-sidebar[data-collapsed="true"] .sb-center { justify-content: center; }
+      #separator-sidebar[data-collapsed="true"] .sb-center { justify-content: center; gap: 0; }
       #separator-sidebar[data-collapsed="true"] .sb-divider { display: block; }
 
       #separator-sidebar[data-collapsed="true"] .sb-tip {
@@ -90,15 +91,10 @@
       <div class="flex h-full flex-col border-e border-blue-100/80 bg-linear-to-b from-sky-50 via-blue-50 to-indigo-100 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950">
 
          {{-- Brand --}}
-         <div class="sb-center flex h-18 shrink-0 items-center px-4">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-               <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30">
-                  <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
-               </span>
-               <span class="sb-label flex flex-col leading-tight">
-                  <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">LMS</span>
-                  <span class="text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Admin Panel</span>
-               </span>
+         <div class="sb-center flex h-18 shrink-0 items-center border-b border-blue-100/70 px-4 dark:border-slate-800">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center">
+               <img src="{{ asset('images/logo.png') }}" alt="LMS Admin" class="sb-hide h-12 w-auto shrink-0">
+               <img src="{{ asset('images/Icon.png') }}" alt="LMS Admin" class="sb-show h-10 w-auto shrink-0">
             </a>
          </div>
 
@@ -135,7 +131,7 @@
                   </button>
                   <div id="dropdown-academic" class="sb-hide grid transition-[grid-template-rows] duration-300 ease-in-out {{ $academicActive ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]' }}"
                        :class="academicOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                     <ul class="space-y-0.5 overflow-hidden">
+                     <ul class="relative space-y-0.5 overflow-hidden before:absolute before:left-[1.53rem] before:top-3 before:bottom-3 before:w-px before:bg-blue-200/70 dark:before:bg-slate-700">
                         <li class="pt-1">
                            <a href="{{ route('admin.curriculum.index') }}" class="{{ $subLink }} {{ $isActive('admin/curriculum*') ? $subActive : $subIdle }}">Curriculum & Subjects</a>
                         </li>
@@ -189,22 +185,41 @@
 
          {{-- Footer: profile, theme toggle, logout --}}
          <div class="shrink-0 space-y-2 border-t border-blue-100/80 bg-white/40 p-3 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/30">
-            <div class="sb-center flex items-center gap-3 rounded-xl px-2 py-1.5">
-               <span class="sb-hide flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-blue-600 text-xs font-semibold text-white ring-2 ring-white dark:ring-slate-800">{{ $initials ?: 'A' }}</span>
+            {{-- Profile card --}}
+            <div class="sb-center flex items-center gap-3 rounded-xl bg-white/60 px-2.5 py-2 ring-1 ring-blue-100/80 dark:bg-white/5 dark:ring-white/10">
+               <span class="relative shrink-0">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-indigo-600 text-xs font-semibold text-white shadow-sm ring-2 ring-white dark:ring-slate-800">{{ $initials ?: 'A' }}</span>
+                  <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" aria-hidden="true"></span>
+               </span>
                <span class="sb-label flex min-w-0 flex-1 flex-col leading-tight">
                   <span class="truncate text-sm font-semibold text-slate-800 dark:text-white">{{ $userName }}</span>
                   <span class="truncate text-xs text-slate-500 dark:text-slate-400">Administrator</span>
                </span>
-
-               {{-- Light / dark mode toggle (uses `dark` from the root layout's x-data) --}}
-               <button type="button" @click="dark = !dark"
-                       :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'"
-                       class="group relative flex h-9 w-9 shrink-0 items-center justify-center overflow-visible rounded-full text-slate-500 transition-colors duration-200 hover:bg-white hover:text-blue-600 hover:shadow-sm dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-yellow-300">
-                  <svg class="absolute h-5 w-5 transition-all duration-500" :class="dark ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 0 1 8.646 3.646 9.003 9.003 0 0 0 12 21a9.003 9.003 0 0 0 8.354-5.646z"/></svg>
-                  <svg class="absolute h-5 w-5 transition-all duration-500" :class="dark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364-.707-.707M6.343 6.343l-.707-.707m12.728 0-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/></svg>
-                  <span class="sb-tip rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg dark:bg-slate-700" x-text="dark ? 'Light mode' : 'Dark mode'"></span>
-               </button>
             </div>
+
+            {{-- Light / dark mode switch (uses `dark` from the root layout's x-data) --}}
+            <button type="button" @click="dark = !dark" role="switch" :aria-checked="dark.toString()"
+                    :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'"
+                    class="group relative flex w-full items-center rounded-xl bg-slate-900/5 p-1 text-xs font-medium ring-1 ring-inset ring-slate-900/5 transition-colors duration-200 hover:bg-slate-900/10 dark:bg-white/5 dark:ring-white/10 dark:hover:bg-white/10">
+               {{-- Sliding thumb --}}
+               <span class="sb-hide absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-white shadow-sm ring-1 ring-slate-900/5 transition-transform duration-300 ease-out dark:bg-slate-700 dark:ring-white/10" :class="dark ? 'translate-x-full' : 'translate-x-0'"></span>
+
+               <span class="sb-hide relative z-10 flex flex-1 items-center justify-center gap-1.5 py-1.5 transition-colors duration-300" :class="dark ? 'text-slate-500' : 'text-amber-600'">
+                  <svg class="h-4 w-4 transition-transform duration-500 group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/></svg>
+                  Light
+               </span>
+               <span class="sb-hide relative z-10 flex flex-1 items-center justify-center gap-1.5 py-1.5 transition-colors duration-300" :class="dark ? 'text-indigo-300' : 'text-slate-500'">
+                  <svg class="h-4 w-4 transition-transform duration-500 group-hover:-rotate-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/></svg>
+                  Dark
+               </span>
+
+               {{-- Collapsed: single icon showing the mode you'd switch to --}}
+               <span class="sb-show relative mx-auto h-8 w-8">
+                  <svg class="absolute inset-1.5 h-5 w-5 text-indigo-600 transition-all duration-500" :class="dark ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/></svg>
+                  <svg class="absolute inset-1.5 h-5 w-5 text-amber-300 transition-all duration-500" :class="dark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/></svg>
+               </span>
+               <span class="sb-tip rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg dark:bg-slate-700" x-text="dark ? 'Light mode' : 'Dark mode'"></span>
+            </button>
 
             <form method="POST" action="{{ route('logout') }}">
                @csrf

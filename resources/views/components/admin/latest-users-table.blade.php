@@ -216,6 +216,36 @@
     </div>
 </dialog>
 
+{{-- Delete OTP Modal: code is emailed to the acting admin and required to delete --}}
+<dialog class="admin-confirm-modal" id="deleteOtpModal" aria-labelledby="delete-otp-title">
+    <form class="admin-confirm-modal__content" id="deleteOtpForm">
+        <div class="admin-confirm-modal__header">
+            <div class="flex items-center gap-3">
+                <div class="admin-confirm-modal__icon admin-otp__icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 id="delete-otp-title" class="admin-confirm-modal__title">Enter verification code</h2>
+                    <p id="delete-otp-status" class="admin-confirm-modal__message" aria-live="polite"></p>
+                </div>
+            </div>
+            <button type="button" class="admin-confirm-modal__close" data-otp-close aria-label="Close">&times;</button>
+        </div>
+        <div class="admin-otp__boxes" role="group" aria-label="6-digit code">
+            @for ($i = 0; $i < 6; $i++)
+                <input type="text" class="admin-otp__digit" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit {{ $i + 1 }}" {{ $i === 0 ? 'autocomplete=one-time-code' : 'autocomplete=off' }} required>
+            @endfor
+        </div>
+        <p id="deleteOtpError" class="admin-otp__error" role="alert"></p>
+        <div class="admin-confirm-modal__actions">
+            <button type="button" class="admin-confirm-modal__btn admin-confirm-modal__btn--cancel" data-otp-close>Cancel</button>
+            <button type="submit" class="admin-confirm-modal__btn admin-confirm-modal__btn--confirm" id="deleteOtpSubmit">Delete</button>
+        </div>
+    </form>
+</dialog>
+
 <style>
     {{-- Theme tokens: light mode (default) uses the light blue palette, html.dark switches to dark --}}
     :root {
@@ -679,6 +709,24 @@
     .admin-confirm-modal__btn--confirm {
         background: #ef4444; color: #fff;
     }
+    .admin-otp__icon { color: #ef4444; background: rgb(239 68 68 / 0.12); }
+    .admin-otp__boxes { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+    .admin-otp__digit {
+        width: 3rem; height: 3.5rem; padding: 0;
+        border: 1.5px solid var(--ut-input-border); border-radius: 0.75rem;
+        background: var(--ut-input-bg); color: var(--ut-text);
+        font-size: 1.5rem; font-weight: 700; text-align: center;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+        transition: border-color .15s, box-shadow .15s, transform .15s;
+    }
+    .admin-otp__digit:focus { outline: none; border-color: var(--ut-accent); box-shadow: 0 0 0 4px var(--ut-accent-ring); transform: translateY(-1px); }
+    .admin-otp__digit.is-filled { border-color: var(--ut-accent); background: var(--ut-accent-soft); }
+    .admin-otp__boxes.is-error .admin-otp__digit { border-color: #ef4444; background: rgb(239 68 68 / 0.08); animation: admin-otp-shake .4s ease; }
+    @keyframes admin-otp-shake { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+    @media (max-width: 400px) { .admin-otp__boxes { gap: 0.375rem; } .admin-otp__digit { width: 2.5rem; height: 3rem; font-size: 1.25rem; } }
+    .admin-otp__error { min-height: 1.25rem; margin: 0.75rem 0 0; font-size: 0.8125rem; color: #ef4444; text-align: center; }
+    .admin-confirm-modal__btn:disabled { opacity: 0.6; cursor: wait; }
 </style>
 
 <script>
@@ -759,7 +807,7 @@
                     window.openConfirmModal(
                         'Delete Account?',
                         `Are you sure you want to delete "${userName}"?`,
-                        () => { window.location.href = `/admin/users/delete/${userId}`; }
+                        () => openDeleteOtp(userId)
                     );
                 }
             });
@@ -801,6 +849,86 @@
                 }
             });
         }
+
+        {{-- Delete OTP: request a code, then submit it to delete --}}
+        const otpModal = document.getElementById('deleteOtpModal');
+        const otpForm = document.getElementById('deleteOtpForm');
+        const otpBoxes = otpForm.querySelector('.admin-otp__boxes');
+        const otpDigits = [...otpForm.querySelectorAll('.admin-otp__digit')];
+        const otpValue = () => otpDigits.map((d) => d.value).join('');
+        const otpSetError = (msg) => {
+            otpError.textContent = msg;
+            otpBoxes.classList.remove('is-error');
+            if (msg) { void otpBoxes.offsetWidth; otpBoxes.classList.add('is-error'); }
+        };
+        const otpFill = (value) => {
+            otpDigits.forEach((d, i) => { d.value = value[i] || ''; d.classList.toggle('is-filled', !!d.value); });
+        };
+        otpDigits.forEach((box, i) => {
+            box.addEventListener('focus', () => box.select());
+            box.addEventListener('input', () => {
+                box.value = box.value.replace(/\D/g, '').slice(-1);
+                box.classList.toggle('is-filled', !!box.value);
+                otpSetError('');
+                if (box.value && i < 5) otpDigits[i + 1].focus();
+                if (otpValue().length === 6 && !otpSubmit.disabled) otpForm.requestSubmit();
+            });
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !box.value && i > 0) otpDigits[i - 1].focus();
+                if (e.key === 'ArrowLeft' && i > 0) otpDigits[i - 1].focus();
+                if (e.key === 'ArrowRight' && i < 5) otpDigits[i + 1].focus();
+            });
+            box.addEventListener('paste', (e) => {
+                const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+                if (!pasted) return;
+                e.preventDefault();
+                otpFill(pasted);
+                otpDigits[Math.min(pasted.length, 5)].focus();
+                if (pasted.length === 6 && !otpSubmit.disabled) otpForm.requestSubmit();
+            });
+        });
+        const otpStatus = document.getElementById('delete-otp-status');
+        const otpError = document.getElementById('deleteOtpError');
+        const otpSubmit = document.getElementById('deleteOtpSubmit');
+        let otpUserId = null;
+
+        const postJson = async (url, body = {}) => {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            return { ok: res.ok, message: data.message || (res.status === 429 ? 'Too many requests. Please wait a minute.' : 'Something went wrong.') };
+        };
+
+        async function openDeleteOtp(userId) {
+            otpUserId = userId;
+            otpFill('');
+            otpSetError('');
+            otpStatus.textContent = 'Sending a code to your email...';
+            otpSubmit.disabled = true;
+            otpModal.showModal();
+            const res = await postJson(`/admin/users/delete/${userId}/otp`);
+            if (otpUserId !== userId) return; // modal was reopened for another user meanwhile
+            otpStatus.textContent = res.ok ? res.message : '';
+            otpSetError(res.ok ? '' : res.message);
+            otpSubmit.disabled = !res.ok;
+            if (res.ok) otpDigits[0].focus();
+        }
+
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (otpValue().length !== 6) return otpSetError('Enter all 6 digits.');
+            otpSubmit.disabled = true;
+            const res = await postJson(`/admin/users/delete/${otpUserId}`, { code: otpValue() });
+            if (res.ok) return window.location.reload();
+            otpSetError(res.message);
+            otpFill('');
+            otpDigits[0].focus();
+            otpSubmit.disabled = false;
+        });
+        otpModal.querySelectorAll('[data-otp-close]').forEach((btn) => btn.addEventListener('click', () => otpModal.close()));
 
         {{-- Confirmation Modal Logic --}}
         const confirmModal = document.getElementById('confirmModal');
@@ -846,9 +974,7 @@
                     window.openConfirmModal(
                         'Delete Account?',
                         `Are you sure you want to delete ${userName}?`,
-                        () => {
-                            window.location.href = `/admin/users/delete/${currentRow.dataset.userId}`;
-                        }
+                        () => openDeleteOtp(currentRow.dataset.userId)
                     );
                 }
             });

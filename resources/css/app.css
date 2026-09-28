@@ -23,6 +23,87 @@
     --color-primary-900: #1e3a8a;
     --color-primary-950: #172554;
     --color-primary: #2563eb;
+
+    /* Landing page (ported from EnrollmentMS landing.css) */
+    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-jakarta: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --color-ink: #16244f;
+    --color-gold: #f4b301;
+    --color-gold-deep: #c85a08;
+    --color-peach: #ffeedd;
+    --color-brand: #2f5fd0;
+    --color-brand-deep: #1e46a8;
+    --shadow-lp-xs: 0 1px 1px rgba(20, 40, 100, 0.04), 0 2px 5px rgba(20, 40, 100, 0.05), 0 8px 16px rgba(20, 40, 100, 0.04);
+    --shadow-lp: 0 1px 2px rgba(20, 40, 100, 0.05), 0 6px 14px rgba(20, 40, 100, 0.06), 0 20px 44px rgba(20, 40, 100, 0.09);
+    --shadow-lp-lg: 0 2px 4px rgba(20, 40, 100, 0.05), 0 12px 26px rgba(20, 40, 100, 0.08), 0 36px 72px rgba(20, 40, 100, 0.15);
+    --animate-sheen: sheen 0.8s cubic-bezier(0.22, 0.8, 0.3, 1);
+    --animate-pulse-dot: pulse-dot 2s ease-out infinite;
+
+    @keyframes sheen {
+        from { left: -80%; }
+        to { left: 130%; }
+    }
+    @keyframes pulse-dot {
+        from { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+        to { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    }
+}
+
+/* Landing page helpers: things too long or repeated to inline as utilities */
+@utility bg-navy {
+    background: linear-gradient(158deg, #24386f, #16244f 58%, #0f1a38);
+}
+/* Amber marker stroke under an emphasised word */
+@utility hl {
+    position: relative;
+    z-index: 0;
+    font-style: normal;
+    white-space: nowrap;
+    &::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        right: -4px;
+        bottom: -0.05em;
+        height: 0.18em;
+        z-index: -1;
+        border-radius: 999px;
+        background: linear-gradient(103deg, #ffd979, #f4b301);
+        transform: scaleX(var(--hl, 1));
+        transform-origin: left;
+    }
+}
+/* Small uppercase label with a short rule before it */
+@utility eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--color-gold-deep);
+    &::before {
+        content: "";
+        width: 22px;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+    }
+}
+/* Landing GSAP (resources/js/landing.js): hide animated blocks until the script reveals them */
+.js-anim [data-hero],
+.js-anim [data-hero-deco],
+.js-anim [data-anim] {
+    visibility: hidden;
+}
+/* GSAP owns opacity/visibility/transform inside animated blocks; Tailwind hover
+   effects there use translate/scale/rotate, which are separate CSS properties. */
+.js-anim [data-hero] *,
+.js-anim [data-anim],
+.js-anim [data-anim] * {
+    transition-property: color, background-color, border-color, box-shadow, translate, scale, rotate;
 }
 
 /* Dark mode via class strategy */
