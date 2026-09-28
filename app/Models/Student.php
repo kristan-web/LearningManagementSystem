@@ -11,6 +11,7 @@ class Student extends Model
 
     protected $fillable = [
         'user_id',
+        'strand_id', 'guardian_id',
         'lrn', 'student_number', 'first_name', 'middle_name', 'last_name',
         'gender', 'birthdate', 'address', 'bio', 'contact_number', 'email',
         'grade_level', 'status',
@@ -34,6 +35,11 @@ class Student extends Model
     public function strand()
     {
         return $this->belongsTo(Strand::class, 'strand_id');
+    }
+
+    public function guardian()
+    {
+        return $this->belongsTo(Guardian::class, 'guardian_id');
     }
 
     public function enrollments()
