@@ -5,13 +5,13 @@
 @section('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.css" />
     <style>
-        /* Theme tokens: light mode (default) uses the light blue palette, html.dark switches to dark. */
+        /* Theme tokens: light mode (default) uses the navy palette (ink #16244f) for text; html.dark switches to dark. */
         .charts-container {
             --card-bg: linear-gradient(160deg, #ffffff 0%, #f0f7ff 100%);
             --card-border: #dbeafe;
             --card-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(37 99 235 / 0.18);
-            --card-text: #0f172a;
-            --card-muted: #64748b;
+            --card-text: #16244f;
+            --card-muted: #737c95;
             --card-grid: #e2e8f0;
         }
         html.dark .charts-container {
@@ -77,10 +77,10 @@
         <div class="chart-center">
             <div class="flex items-center justify-between mb-2">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">All registered users in the learning management system.</p>
+                    <h1 class="text-2xl font-bold text-ink dark:text-white">User Management</h1>
+                    <p class="mt-1 text-sm text-ink/60 dark:text-gray-400">All registered users in the learning management system.</p>
                 </div>
-                <a href="{{ route('admin.users.create') }}" class="flex items-center gap-2 px-4 py-2 bg-primary-700 hover:bg-primary-800 text-white text-sm font-medium rounded-lg transition-colors">
+                <a href="{{ route('admin.users.create') }}" class="btn-navy">
                     <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" /></svg>
                      Add Account
                 </a>
@@ -116,11 +116,11 @@
             const roleCounts = usersByRoleData.map(x => x.total);
 
             new ApexCharts(document.getElementById('chart-users-role'), {
-                chart: { type: 'bar', height: 250, fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                chart: { type: 'bar', height: 250, fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                 plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } },
                 xaxis: { categories: roleLabels, labels: { style: { colors: '#c4b5fd', fontSize: '11px' } }, axisBorder: { show: false }, axisTicks: { color: '#374151' } },
                 yaxis: { labels: { style: { colors: '#c4b5fd', fontSize: '11px' } } },
-                colors: ['#8b5cf6'],
+                colors: ['#2f5fd0'],
                 series: [{ name: 'Users', data: roleCounts }],
                 legend: { show: false },
                 tooltip: { theme: 'dark' },
@@ -132,10 +132,10 @@
             const statusCounts = usersByStatusData.map(x => x.total);
 
             new ApexCharts(document.getElementById('chart-users-status'), {
-                chart: { type: 'pie', height: 250, fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                chart: { type: 'pie', height: 250, fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                 labels: statusLabels,
                 series: statusCounts,
-                colors: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'],
+                colors: ['#10b981', '#f59e0b', '#ef4444', '#2f5fd0', '#16244f'],
                 legend: { position: 'bottom', labels: { colors: '#c4b5fd', fontSize: '11px' } },
                 noData: { text: 'No status data', align: 'center', style: { color: '#c4b5fd', fontSize: '14px' } },
                 responsive: [{ breakpoint: 640, options: { chart: { height: 200 } } }]

@@ -15,6 +15,9 @@
 
 @section('title', 'Admin Dashboard')
 
+{{-- Landing/login theme: Plus Jakarta Sans, navy ink text, light brand-tinted background --}}
+@section('body_class', 'font-jakarta !text-ink !bg-[#f4f6fb] dark:!bg-gray-900 dark:!text-gray-100')
+
 @section('styles')
     {{-- Admin-specific styles --}}
 @endsection

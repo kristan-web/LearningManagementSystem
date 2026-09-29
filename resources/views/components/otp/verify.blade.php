@@ -3,10 +3,10 @@
 @section('title', 'Verify Code')
 
 @section('content')
-    <h1 class="text-center text-3xl font-extrabold tracking-tight text-slate-900">
-        Verify Your <span class="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Email</span>
+    <h1 class="text-center font-display text-3xl font-bold tracking-[-.6px] text-ink">
+        Verify Your <span class="bg-linear-to-r from-brand to-ink bg-clip-text text-transparent">Email</span>
     </h1>
-    <p id="otp-hint" class="mt-3 text-center text-sm font-medium text-slate-500">
+    <p id="otp-hint" class="mt-3 text-center text-sm font-medium text-ink/60">
         Enter your email and we'll send you a 6-digit code.
     </p>
 
@@ -16,17 +16,17 @@
     <form id="send-form" class="mt-8" novalidate>
         <label for="email" class="sr-only">Email</label>
         <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sky-500">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-brand">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="14" rx="2"/>
                     <path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </span>
             <input type="email" id="email" name="email" value="{{ request('email') }}" required autofocus autocomplete="email" placeholder="Email"
-                   class="block w-full rounded-xl border border-sky-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-200/60">
+                   class="block w-full rounded-xl border border-ink/15 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15">
         </div>
         <div class="mt-8 flex justify-center">
-            <button type="submit" id="send-btn" class="w-40 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:from-sky-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-sky-300 active:scale-[.98] disabled:opacity-60">
+            <button type="submit" id="send-btn" class="btn-navy w-40">
                 Send code
             </button>
         </div>
@@ -39,24 +39,24 @@
             <div id="otp-boxes" class="flex justify-center gap-2 sm:gap-3">
                 @for ($i = 0; $i < 6; $i++)
                     <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit {{ $i + 1 }}" {{ $i === 0 ? 'autocomplete=one-time-code' : 'autocomplete=off' }}
-                           class="otp-digit h-12 w-11 sm:h-14 sm:w-12 rounded-xl border border-sky-200 bg-white text-center text-xl font-bold text-slate-900 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-200/60">
+                           class="otp-digit h-12 w-11 sm:h-14 sm:w-12 rounded-xl border border-ink/15 bg-white text-center text-xl font-bold text-ink shadow-sm transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15">
                 @endfor
             </div>
         </fieldset>
         <div class="mt-8 flex justify-center">
-            <button type="submit" id="verify-btn" class="w-40 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:from-sky-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-sky-300 active:scale-[.98] disabled:opacity-60">
+            <button type="submit" id="verify-btn" class="btn-navy w-40">
                 Verify
             </button>
         </div>
-        <p class="mt-8 text-center text-sm font-medium text-slate-500">
+        <p class="mt-8 text-center text-sm font-medium text-ink/60">
             Didn't get it?
-            <button type="button" id="resend-btn" class="font-bold text-sky-700 underline underline-offset-2 hover:text-sky-900 disabled:no-underline disabled:text-slate-400">Resend</button>
-            · <button type="button" id="change-email" class="font-bold text-sky-700 underline underline-offset-2 hover:text-sky-900">Change email</button>
+            <button type="button" id="resend-btn" class="font-bold text-brand-deep underline underline-offset-2 hover:text-ink disabled:no-underline disabled:text-ink/40">Resend</button>
+            · <button type="button" id="change-email" class="font-bold text-brand-deep underline underline-offset-2 hover:text-ink">Change email</button>
         </p>
     </form>
 
     <p class="mt-8 text-center">
-        <a href="{{ route('login') }}" class="text-sm font-semibold text-sky-700 underline underline-offset-4 hover:text-sky-900">Back to login</a>
+        <a href="{{ route('login') }}" class="text-sm font-semibold text-brand-deep underline underline-offset-4 hover:text-ink">Back to login</a>
     </p>
 @endsection
 

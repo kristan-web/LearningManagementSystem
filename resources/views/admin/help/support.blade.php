@@ -7,13 +7,13 @@
 
     $card = 'rounded-2xl border border-blue-100 bg-linear-to-b from-white to-sky-50/60 shadow-[0_12px_32px_-16px_rgb(37_99_235/0.25)] transition-colors duration-300 dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:shadow-none';
     $cardHead = 'flex items-start gap-3 border-b border-blue-100 px-6 py-4 dark:border-slate-700';
-    $cardIcon = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300';
-    $cardTitle = 'text-base font-semibold text-slate-900 dark:text-white';
-    $cardSub = 'mt-0.5 text-xs text-slate-500 dark:text-slate-400';
-    $label = 'mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300';
-    $input = 'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 shadow-xs transition focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-blue-400';
-    $readonly = 'block w-full cursor-not-allowed rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400';
-    $hint = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
+    $cardIcon = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-brand dark:bg-blue-500/15 dark:text-blue-300';
+    $cardTitle = 'text-base font-semibold text-ink dark:text-white';
+    $cardSub = 'mt-0.5 text-xs text-ink/60 dark:text-slate-400';
+    $label = 'mb-1.5 block text-sm font-medium text-ink/80 dark:text-slate-300';
+    $input = 'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-ink placeholder-slate-400 shadow-xs transition focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-blue-400';
+    $readonly = 'block w-full cursor-not-allowed rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-ink/60 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400';
+    $hint = 'mt-1 text-xs text-ink/60 dark:text-slate-400';
     $req = 'text-red-500';
 
     $channels = [
@@ -28,7 +28,7 @@
     $categories = ['Account & Access', 'User Management', 'Curriculum & Subjects', 'Enrollment', 'Reports', 'Bug Report', 'Other'];
     $priorities = [
         'Low' => 'peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 dark:peer-checked:border-emerald-400 dark:peer-checked:bg-emerald-500/15 dark:peer-checked:text-emerald-300',
-        'Normal' => 'peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-500/15 dark:peer-checked:text-blue-300',
+        'Normal' => 'peer-checked:border-brand peer-checked:bg-blue-50 peer-checked:text-brand-deep dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-500/15 dark:peer-checked:text-blue-300',
         'High' => 'peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-700 dark:peer-checked:border-amber-400 dark:peer-checked:bg-amber-500/15 dark:peer-checked:text-amber-300',
         'Urgent' => 'peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 dark:peer-checked:border-red-400 dark:peer-checked:bg-red-500/15 dark:peer-checked:text-red-300',
     ];
@@ -39,8 +39,8 @@
 
     {{-- Page header --}}
     <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Support</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Get help from the IT team or send a support request.</p>
+        <h1 class="text-2xl font-bold text-ink dark:text-white">Support</h1>
+        <p class="text-sm text-ink/60 dark:text-slate-400">Get help from the IT team or send a support request.</p>
     </div>
 
     {{-- Hero --}}
@@ -50,7 +50,7 @@
                 <h2 class="text-lg font-semibold">Need a quick answer?</h2>
                 <p class="mt-1 text-sm text-blue-50">Most questions are covered by the step-by-step guides.</p>
             </div>
-            <a href="{{ route('admin.documentation') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <a href="{{ route('admin.documentation') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-brand-deep shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4"/></svg>
                 Browse Documentation
             </a>
@@ -76,13 +76,13 @@
                     @foreach ($channels as $channel)
                         <li>
                             <a @if ($channel['href']) href="{{ $channel['href'] }}" @endif class="flex items-start gap-3 rounded-xl px-3 py-3 transition {{ $channel['href'] ? 'hover:bg-white hover:shadow-sm dark:hover:bg-white/5' : '' }}">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-blue-600 ring-1 ring-blue-100 dark:bg-slate-900 dark:text-blue-300 dark:ring-slate-700">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-brand ring-1 ring-blue-100 dark:bg-slate-900 dark:text-blue-300 dark:ring-slate-700">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $channel['icon'] }}"/></svg>
                                 </span>
                                 <span class="min-w-0">
-                                    <span class="block text-xs font-medium text-slate-500 dark:text-slate-400">{{ $channel['title'] }}</span>
-                                    <span class="block truncate text-sm font-semibold text-slate-900 dark:text-white">{{ $channel['value'] }}</span>
-                                    <span class="block text-xs text-slate-500 dark:text-slate-400">{{ $channel['note'] }}</span>
+                                    <span class="block text-xs font-medium text-ink/60 dark:text-slate-400">{{ $channel['title'] }}</span>
+                                    <span class="block truncate text-sm font-semibold text-ink dark:text-white">{{ $channel['value'] }}</span>
+                                    <span class="block text-xs text-ink/60 dark:text-slate-400">{{ $channel['note'] }}</span>
                                 </span>
                             </a>
                         </li>
@@ -104,7 +104,7 @@
                 <ul class="space-y-3 px-6 py-5">
                     @foreach (['Web Portal', 'Database', 'Email Notifications'] as $service)
                         <li class="flex items-center justify-between text-sm">
-                            <span class="text-slate-700 dark:text-slate-300">{{ $service }}</span>
+                            <span class="text-ink/80 dark:text-slate-300">{{ $service }}</span>
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                                 Operational
@@ -133,10 +133,10 @@
                     <span class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300">
                         <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </span>
-                    <h4 class="mt-4 text-base font-semibold text-slate-900 dark:text-white">Request sent</h4>
-                    <p class="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">We will reply to {{ $user->email }} as soon as possible.</p>
+                    <h4 class="mt-4 text-base font-semibold text-ink dark:text-white">Request sent</h4>
+                    <p class="mt-1 max-w-sm text-sm text-ink/60 dark:text-slate-400">We will reply to {{ $user->email }} as soon as possible.</p>
                     <button type="button" @click="sent = false; message = ''; $nextTick(() => $refs.form.reset())"
-                            class="mt-5 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                            class="mt-5 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-ink/80 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
                         Send another request
                     </button>
                 </div>
@@ -166,7 +166,7 @@
                             @foreach ($priorities as $priority => $checked)
                                 <label class="cursor-pointer">
                                     <input type="radio" name="priority" value="{{ $priority }}" class="peer sr-only" {{ $priority === 'Normal' ? 'checked' : '' }}>
-                                    <span class="flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:border-blue-300 peer-focus-visible:ring-3 peer-focus-visible:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 {{ $checked }}">{{ $priority }}</span>
+                                    <span class="flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-ink/70 transition hover:border-brand/40 peer-focus-visible:ring-3 peer-focus-visible:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 {{ $checked }}">{{ $priority }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -186,12 +186,12 @@
                     <div class="sm:col-span-2">
                         <label for="attachment" class="{{ $label }}">Screenshot</label>
                         <input type="file" id="attachment" name="attachment" accept="image/*"
-                               class="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:text-slate-400 dark:file:bg-blue-500/15 dark:file:text-blue-300">
+                               class="block w-full text-sm text-ink/60 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-deep hover:file:bg-blue-100 dark:text-slate-400 dark:file:bg-blue-500/15 dark:file:text-blue-300">
                         <p class="{{ $hint }}">Optional. PNG or JPG.</p>
                     </div>
                     <div class="flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end">
-                        <button type="reset" @click="message = ''" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Clear</button>
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:shadow-blue-500/40 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-500/30">
+                        <button type="reset" @click="message = ''" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-ink/80 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Clear</button>
+                        <button type="submit" class="btn-navy">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2Zm0 0v-8"/></svg>
                             Send Request
                         </button>

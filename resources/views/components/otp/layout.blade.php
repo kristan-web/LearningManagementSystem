@@ -3,10 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{{ asset('images/Enrollment logo.png') }}">
     <title>{{ config('app.name', 'Flowbite') }} - @yield('title')</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
+    <!-- Fonts (same as the landing and login pages) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -83,9 +86,9 @@
 
         .owl-bubble {
             position: absolute; top: 100%; right: .25rem; margin-top: .25rem;
-            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #e0f2fe;
-            background: #fff; color: #075985; font-size: .75rem; font-weight: 600; white-space: nowrap;
-            box-shadow: 0 10px 24px -10px rgba(2, 132, 199, .5);
+            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #dbe5fb;
+            background: #fff; color: #16244f; font-size: .75rem; font-weight: 600; white-space: nowrap;
+            box-shadow: 0 10px 24px -10px rgba(22, 36, 79, .45);
             opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: top right; pointer-events: none;
             transition: opacity .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
         }
@@ -99,7 +102,7 @@
         }
     </style>
 </head>
-<body class="otp-bg min-h-screen antialiased">
+<body class="otp-bg min-h-screen font-jakarta text-ink antialiased selection:bg-gold/30">
     <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
         <div class="bg-dots absolute inset-0"></div>
     </div>
@@ -107,8 +110,9 @@
     <section class="min-h-screen flex">
         <div class="relative flex flex-col w-full">
 
-            <a href="{{ url('/') }}" class="absolute top-2 left-2 sm:top-3 sm:left-6">
-                <img src="{{ asset('images/Icon.png') }}" alt="LMS" class="h-12 sm:h-16 w-auto">
+            {{-- Sized and placed to mirror the owl on the right (same as the login page) --}}
+            <a href="{{ route('landing') }}" class="absolute top-4 left-4 sm:top-6 sm:left-10" aria-label="Enrollment Management System home">
+                <img src="{{ asset('images/Enrollment logo.png') }}" alt="Enrollment Management System logo" class="w-20 sm:w-28 lg:w-32 h-auto">
             </a>
 
 
@@ -118,21 +122,21 @@
                 <svg id="owl" class="owl block w-20 sm:w-28 lg:w-32 h-auto" viewBox="0 0 160 150">
                     <defs>
                         <radialGradient id="owl-g-body" cx="40%" cy="30%" r="75%">
-                            <stop offset="0" stop-color="#38bdf8"/>
-                            <stop offset=".55" stop-color="#0284c7"/>
-                            <stop offset="1" stop-color="#075985"/>
+                            <stop offset="0" stop-color="#5b84e6"/>
+                            <stop offset=".55" stop-color="#2f5fd0"/>
+                            <stop offset="1" stop-color="#16244f"/>
                         </radialGradient>
                         <radialGradient id="owl-g-belly" cx="50%" cy="30%" r="75%">
                             <stop offset="0" stop-color="#ffffff"/>
-                            <stop offset="1" stop-color="#bae6fd"/>
+                            <stop offset="1" stop-color="#dbe5fb"/>
                         </radialGradient>
                         <radialGradient id="owl-g-eye" cx="45%" cy="40%" r="60%">
                             <stop offset=".7" stop-color="#ffffff"/>
                             <stop offset="1" stop-color="#dbeafe"/>
                         </radialGradient>
                         <linearGradient id="owl-g-wing" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0" stop-color="#0284c7"/>
-                            <stop offset="1" stop-color="#0c4a6e"/>
+                            <stop offset="0" stop-color="#2f5fd0"/>
+                            <stop offset="1" stop-color="#16244f"/>
                         </linearGradient>
                         <linearGradient id="owl-g-beak" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0" stop-color="#fcd34d"/>
@@ -140,7 +144,7 @@
                         </linearGradient>
                     </defs>
 
-                    <ellipse class="owl-shadow" cx="80" cy="146" rx="34" ry="3.5" fill="#0c4a6e" opacity=".18"/>
+                    <ellipse class="owl-shadow" cx="80" cy="146" rx="34" ry="3.5" fill="#16244f" opacity=".18"/>
 
                     <g class="owl-float">
                         <g class="owl-hop">
@@ -155,16 +159,16 @@
                                 </g>
 
                                 <g class="owl-tilt">
-                                    <path d="M40 58C30 48 27 36 29 26c9 6 19 14 26 24Z" fill="#075985"/>
-                                    <path d="M120 58c10-10 13-22 11-32-9 6-19 14-26 24Z" fill="#075985"/>
+                                    <path d="M40 58C30 48 27 36 29 26c9 6 19 14 26 24Z" fill="#1e46a8"/>
+                                    <path d="M120 58c10-10 13-22 11-32-9 6-19 14-26 24Z" fill="#1e46a8"/>
                                     <ellipse cx="80" cy="92" rx="52" ry="47" fill="url(#owl-g-body)"/>
                                     <ellipse cx="80" cy="110" rx="32" ry="27" fill="url(#owl-g-belly)"/>
-                                    <path d="M66 104q4 4 8 0m4 0q4 4 8 0m4 0q4 4 8 0M72 114q4 4 8 0m4 0q4 4 8 0M76 124q4 4 8 0" stroke="#7dd3fc" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                    <path d="M66 104q4 4 8 0m4 0q4 4 8 0m4 0q4 4 8 0M72 114q4 4 8 0m4 0q4 4 8 0M76 124q4 4 8 0" stroke="#a9bff0" stroke-width="2" fill="none" stroke-linecap="round"/>
 
-                                    <circle cx="58" cy="74" r="25" fill="#7dd3fc" opacity=".3"/>
-                                    <circle cx="102" cy="74" r="25" fill="#7dd3fc" opacity=".3"/>
-                                    <circle cx="58" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#0c4a6e" stroke-opacity=".25" stroke-width="2"/>
-                                    <circle cx="102" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#0c4a6e" stroke-opacity=".25" stroke-width="2"/>
+                                    <circle cx="58" cy="74" r="25" fill="#a9bff0" opacity=".3"/>
+                                    <circle cx="102" cy="74" r="25" fill="#a9bff0" opacity=".3"/>
+                                    <circle cx="58" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#16244f" stroke-opacity=".25" stroke-width="2"/>
+                                    <circle cx="102" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#16244f" stroke-opacity=".25" stroke-width="2"/>
                                     <g class="owl-pupil" data-cx="58" data-cy="74">
                                         <circle cx="58" cy="74" r="9.5" fill="#0f172a"/>
                                         <circle cx="61.5" cy="70" r="3.2" fill="#fff"/>
@@ -179,10 +183,10 @@
                                         <path d="M47 78q11-13 22 0"/>
                                         <path d="M91 78q11-13 22 0"/>
                                     </g>
-                                    <circle class="owl-lid" cx="58" cy="74" r="21" fill="#0284c7" style="transform-origin: 58px 53px"/>
-                                    <circle class="owl-lid" cx="102" cy="74" r="21" fill="#0284c7" style="transform-origin: 102px 53px"/>
-                                    <path class="owl-brow owl-brow-l" d="M44 50q13-7 26-1" stroke="#0c4a6e" stroke-width="4" fill="none" stroke-linecap="round"/>
-                                    <path class="owl-brow owl-brow-r" d="M90 49q13-6 26 1" stroke="#0c4a6e" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                    <circle class="owl-lid" cx="58" cy="74" r="21" fill="#2f5fd0" style="transform-origin: 58px 53px"/>
+                                    <circle class="owl-lid" cx="102" cy="74" r="21" fill="#2f5fd0" style="transform-origin: 102px 53px"/>
+                                    <path class="owl-brow owl-brow-l" d="M44 50q13-7 26-1" stroke="#16244f" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                    <path class="owl-brow owl-brow-r" d="M90 49q13-6 26 1" stroke="#16244f" stroke-width="4" fill="none" stroke-linecap="round"/>
                                     <ellipse class="owl-cheek" cx="49" cy="99" rx="5.5" ry="3.2" fill="#fb7185"/>
                                     <ellipse class="owl-cheek" cx="111" cy="99" rx="5.5" ry="3.2" fill="#fb7185"/>
                                     <ellipse class="owl-mouth" cx="80" cy="99" rx="4.5" ry="5" fill="#9a3412"/>
@@ -200,19 +204,19 @@
                                     <g class="owl-wing owl-wing-l" style="transform-origin: 34px 100px">
                                         <g class="owl-flap owl-flap-l">
                                             <ellipse cx="34" cy="100" rx="14" ry="26" fill="url(#owl-g-wing)"/>
-                                            <path d="M28 96q6 4 12 0M28 106q6 4 12 0M30 116q5 3 9 0" stroke="#38bdf8" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                            <path d="M28 96q6 4 12 0M28 106q6 4 12 0M30 116q5 3 9 0" stroke="#8fb0f5" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
                                         </g>
                                     </g>
                                     <g class="owl-wing owl-wing-r" style="transform-origin: 126px 100px">
                                         <g class="owl-flap owl-flap-r">
                                             <ellipse cx="126" cy="100" rx="14" ry="26" fill="url(#owl-g-wing)"/>
-                                            <path d="M120 96q6 4 12 0M120 106q6 4 12 0M121 116q5 3 9 0" stroke="#38bdf8" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                            <path d="M120 96q6 4 12 0M120 106q6 4 12 0M121 116q5 3 9 0" stroke="#8fb0f5" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
                                         </g>
                                     </g>
                                 </g>
                             </g>
                         </g>
-                        <text class="owl-mark owl-q" x="130" y="40" fill="#0369a1" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">?</text>
+                        <text class="owl-mark owl-q" x="130" y="40" fill="#1e46a8" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">?</text>
                         <text class="owl-mark owl-ex" x="132" y="40" fill="#f59e0b" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">!</text>
                     </g>
                 </svg>

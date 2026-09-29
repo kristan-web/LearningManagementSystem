@@ -56,7 +56,7 @@
                 </ul>
                 <div class="admin-users-panel__filter-actions mt-3 pt-3 border-t">
                     <button type="button" class="admin-users-panel__clear-btn" id="clearFilters">Clear All</button>
-                    <button type="submit" class="admin-users-panel__apply-btn">Apply</button>
+                    <button type="submit" class="admin-users-panel__apply-btn btn-navy">Apply</button>
                 </div>
             </div>
         </div>
@@ -175,7 +175,7 @@
         </dl>
         @if($showActionsModal)
         <div class="admin-user-modal__actions mt-4 pt-3 border-t">
-            <a href="#" id="modal-action-edit" class="admin-user-modal__action-btn admin-user-modal__action-btn--edit">
+            <a href="#" id="modal-action-edit" class="admin-user-modal__action-btn admin-user-modal__action-btn--edit btn-navy">
                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewbox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
                 Edit
             </a>
@@ -247,33 +247,33 @@
 </dialog>
 
 <style>
-    {{-- Theme tokens: light mode (default) uses the light blue palette, html.dark switches to dark --}}
+    {{-- Theme tokens: light mode (default) uses the landing/login navy palette (ink #16244f, brand #2f5fd0), html.dark switches to dark --}}
     :root {
-        --ut-panel-bg: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
-        --ut-panel-border: #dbeafe;
-        --ut-panel-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px -16px rgb(37 99 235 / 0.25);
-        --ut-divider: #e0ecff;
-        --ut-text: #0f172a;
-        --ut-text-soft: #334155;
-        --ut-muted: #64748b;
-        --ut-accent: #2563eb;
-        --ut-accent-hover: #1d4ed8;
-        --ut-accent-soft: #eff6ff;
-        --ut-accent-ring: rgb(59 130 246 / 0.25);
+        --ut-panel-bg: linear-gradient(180deg, #ffffff 0%, #f7f9fe 100%);
+        --ut-panel-border: #e3e8f4;
+        --ut-panel-shadow: 0 1px 2px rgb(22 36 79 / 0.04), 0 12px 32px -16px rgb(22 36 79 / 0.18);
+        --ut-divider: #eef1f8;
+        --ut-text: #16244f;
+        --ut-text-soft: #455072;
+        --ut-muted: #737c95;
+        --ut-accent: #2f5fd0;
+        --ut-accent-hover: #1e46a8;
+        --ut-accent-soft: #f0f4fd;
+        --ut-accent-ring: rgb(47 95 208 / 0.2);
         --ut-input-bg: #ffffff;
-        --ut-input-border: #cbd5e1;
+        --ut-input-border: #d5dcec;
         --ut-row-bg: #ffffff;
-        --ut-row-border: #e2e8f0;
-        --ut-row-hover: #f0f7ff;
-        --ut-row-hover-border: #bfdbfe;
-        --ut-chip-bg: #eff6ff;
-        --ut-chip-text: #1d4ed8;
+        --ut-row-border: #e3e8f4;
+        --ut-row-hover: #f5f7fd;
+        --ut-row-hover-border: #c9d6f5;
+        --ut-chip-bg: #16244f;
+        --ut-chip-text: #ffffff;
         --ut-surface: #ffffff;
-        --ut-surface-soft: #f8fafc;
-        --ut-cancel-bg: #f1f5f9;
-        --ut-cancel-text: #334155;
-        --ut-backdrop: rgb(15 23 42 / 0.45);
-        --ut-modal-shadow: 0 24px 60px -12px rgb(15 23 42 / 0.3);
+        --ut-surface-soft: #f7f9fe;
+        --ut-cancel-bg: #eef1f8;
+        --ut-cancel-text: #455072;
+        --ut-backdrop: rgb(22 36 79 / 0.45);
+        --ut-modal-shadow: 0 24px 60px -12px rgb(22 36 79 / 0.3);
     }
     html.dark {
         --ut-panel-bg: linear-gradient(180deg, #1e293b 0%, #172033 100%);
@@ -322,7 +322,7 @@
         padding: 1.25rem 1.5rem;
         border-bottom: 1px solid var(--ut-divider);
     }
-    .admin-users-panel__title { margin: 0; color: var(--ut-text); font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
+    .admin-users-panel__title { margin: 0; color: var(--ut-text); font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
     .admin-users-panel__subtitle { margin: 0.25rem 0 0; color: var(--ut-muted); font-size: 0.8125rem; }
     .admin-users-panel__count {
         margin: 0;
@@ -428,18 +428,15 @@
         gap: 0.5rem;
         border-color: var(--ut-divider);
     }
-    .admin-users-panel__clear-btn,
-    .admin-users-panel__apply-btn {
+    .admin-users-panel__clear-btn {
         flex: 1;
+        min-height: 2.625rem; /* same height as .btn-navy beside it */
         padding: 0.4375rem 0.75rem;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         font-size: 0.8125rem;
         font-weight: 600;
         cursor: pointer;
-        border: none;
         transition: background 0.2s, color 0.2s;
-    }
-    .admin-users-panel__clear-btn {
         background: transparent;
         color: var(--ut-muted);
         border: 1px solid var(--ut-input-border);
@@ -448,13 +445,7 @@
         background: var(--ut-cancel-bg);
         color: var(--ut-text);
     }
-    .admin-users-panel__apply-btn {
-        background: var(--ut-accent);
-        color: #fff;
-    }
-    .admin-users-panel__apply-btn:hover {
-        background: var(--ut-accent-hover);
-    }
+    .admin-users-panel__apply-btn { flex: 1; } /* look comes from .btn-navy */
 
     .admin-users-table-wrap { width: 100%; padding-bottom: 0.5rem; }
     .admin-users-table {
@@ -585,7 +576,7 @@
     .admin-user-modal__details dt { color: var(--ut-muted); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
     .admin-user-modal__details dd { margin: 0.25rem 0 0; overflow-wrap: anywhere; font-size: 0.875rem; font-weight: 500; color: var(--ut-text); }
     .admin-user-modal__actions { display: flex; flex-direction: column; gap: 0.5rem; border-color: var(--ut-divider); }
-    .admin-user-modal__action-btn {
+    .admin-user-modal__action-btn:not(.btn-navy) {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -599,10 +590,9 @@
         text-decoration: none;
         transition: filter 0.2s, transform 0.2s;
     }
-    .admin-user-modal__action-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .admin-user-modal__action-btn:not(.btn-navy):hover { filter: brightness(1.08); transform: translateY(-1px); }
     .admin-user-modal__action-btn.hidden { display: none; }
     .admin-user-modal__action-btn--show { background: #10b981; }
-    .admin-user-modal__action-btn--edit { background: var(--ut-accent); }
     .admin-user-modal__action-btn--delete { background: #ef4444; }
 
     @media (max-width: 639px) {
@@ -636,8 +626,8 @@
         flex-shrink: 0;
     }
     .admin-users-table__action-btn:hover { transform: scale(1.08); }
-    .admin-users-table__action-btn--edit  { background: rgb(59 130 246 / 0.12); color: #2563eb; }
-    .admin-users-table__action-btn--edit:hover  { background: #3b82f6; color: #fff; }
+    .admin-users-table__action-btn--edit  { background: rgb(47 95 208 / 0.12); color: #2f5fd0; }
+    .admin-users-table__action-btn--edit:hover  { background: #2f5fd0; color: #fff; }
     .admin-users-table__action-btn--delete { background: rgb(239 68 68 / 0.12); color: #dc2626; }
     .admin-users-table__action-btn--delete:hover { background: #ef4444; color: #fff; }
     .admin-users-table__action-btn--restore { background: rgb(16 185 129 / 0.12); color: #059669; }

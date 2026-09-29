@@ -7,13 +7,13 @@
 
     $card = 'rounded-2xl border border-blue-100 bg-linear-to-b from-white to-sky-50/60 shadow-[0_12px_32px_-16px_rgb(37_99_235/0.25)] transition-colors duration-300 dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:shadow-none';
     $cardHead = 'flex items-start gap-3 border-b border-blue-100 px-6 py-4 dark:border-slate-700';
-    $cardIcon = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300';
-    $cardTitle = 'text-base font-semibold text-slate-900 dark:text-white';
-    $cardSub = 'mt-0.5 text-xs text-slate-500 dark:text-slate-400';
-    $label = 'mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300';
-    $input = 'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 shadow-xs transition focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-blue-400';
-    $readonly = 'block w-full cursor-not-allowed rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400';
-    $hint = 'mt-1 text-xs text-slate-500 dark:text-slate-400';
+    $cardIcon = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-brand dark:bg-blue-500/15 dark:text-blue-300';
+    $cardTitle = 'text-base font-semibold text-ink dark:text-white';
+    $cardSub = 'mt-0.5 text-xs text-ink/60 dark:text-slate-400';
+    $label = 'mb-1.5 block text-sm font-medium text-ink/80 dark:text-slate-300';
+    $input = 'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-ink placeholder-slate-400 shadow-xs transition focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-blue-400';
+    $readonly = 'block w-full cursor-not-allowed rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-ink/60 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400';
+    $hint = 'mt-1 text-xs text-ink/60 dark:text-slate-400';
     $error = 'mt-1 text-xs font-medium text-red-600 dark:text-red-400';
     $req = 'text-red-500';
 @endphp
@@ -23,8 +23,8 @@
 
     {{-- Page header --}}
     <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">System Settings</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Manage your account details, contact information and security.</p>
+        <h1 class="text-2xl font-bold text-ink dark:text-white">System Settings</h1>
+        <p class="text-sm text-ink/60 dark:text-slate-400">Manage your account details, contact information and security.</p>
     </div>
 
     @if ($errors->any())
@@ -43,13 +43,13 @@
             <section class="{{ $card }} overflow-hidden">
                 <div class="h-20 bg-linear-to-r from-sky-400 via-blue-500 to-indigo-500"></div>
                 <div class="-mt-10 flex flex-col items-center px-6 pb-6 text-center">
-                    <span class="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-blue-600 text-2xl font-bold text-white ring-4 ring-white dark:ring-slate-800">
+                    <span class="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-[#3a52a0] to-ink text-2xl font-bold text-white ring-4 ring-white dark:ring-slate-800">
                         {{ mb_strtoupper(mb_substr($user->first_name ?? '', 0, 1) . mb_substr($user->last_name ?? '', 0, 1)) }}
                     </span>
-                    <h2 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">{{ trim($user->first_name . ' ' . $user->last_name) }}</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">{{ $user->email }}</p>
+                    <h2 class="mt-3 text-lg font-semibold text-ink dark:text-white">{{ trim($user->first_name . ' ' . $user->last_name) }}</h2>
+                    <p class="text-sm text-ink/60 dark:text-slate-400">{{ $user->email }}</p>
                     <div class="mt-3 flex flex-wrap justify-center gap-2">
-                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">{{ $user->role }}</span>
+                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-brand-deep dark:bg-blue-500/15 dark:text-blue-300">{{ $user->role }}</span>
                         <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $user->status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300' }}">{{ $user->status }}</span>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     <div>
                         <span class="{{ $label }}">Account Deleted</span>
                         <label for="is_deleted" class="flex cursor-not-allowed items-center justify-between rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 dark:border-slate-600 dark:bg-slate-800/60">
-                            <span class="text-sm text-slate-500 dark:text-slate-400">{{ $user->is_deleted ? 'Yes' : 'No' }}</span>
+                            <span class="text-sm text-ink/60 dark:text-slate-400">{{ $user->is_deleted ? 'Yes' : 'No' }}</span>
                             <input type="checkbox" id="is_deleted" class="peer sr-only" {{ $user->is_deleted ? 'checked' : '' }} disabled>
                             <span class="relative h-5 w-9 rounded-full bg-slate-300 transition after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition peer-checked:bg-red-500 peer-checked:after:translate-x-4 dark:bg-slate-600"></span>
                         </label>
@@ -132,7 +132,7 @@
                             @foreach (['Male', 'Female', 'Other'] as $gender)
                                 <label class="cursor-pointer">
                                     <input type="radio" name="gender" value="{{ $gender }}" class="peer sr-only" {{ old('gender', $user->gender) === $gender ? 'checked' : '' }}>
-                                    <span class="flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:border-blue-300 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-focus-visible:ring-3 peer-focus-visible:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-500/15 dark:peer-checked:text-blue-300">{{ $gender }}</span>
+                                    <span class="flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-ink/70 transition hover:border-brand/40 peer-checked:border-brand peer-checked:bg-blue-50 peer-checked:text-brand-deep peer-focus-visible:ring-3 peer-focus-visible:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-500/15 dark:peer-checked:text-blue-300">{{ $gender }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -221,7 +221,7 @@
                     <div class="relative">
                         <input :type="show ? 'text' : 'password'" type="password" id="password" name="password" minlength="8" autocomplete="new-password" class="{{ $input }} pr-11" placeholder="At least 8 characters">
                         <button type="button" @click="show = !show" :aria-label="show ? 'Hide password' : 'Show password'"
-                                class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-slate-400 transition hover:text-blue-600 dark:hover:text-blue-300">
+                                class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink/45 transition hover:text-brand dark:hover:text-blue-300">
                             <svg x-show="!show" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/></svg>
                             <svg x-show="show" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21"/></svg>
                         </button>
@@ -232,8 +232,8 @@
 
             {{-- Actions --}}
             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Cancel</a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:shadow-blue-500/40 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-500/30">
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-ink/80 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Cancel</a>
+                <button type="submit" class="btn-navy">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     Save Changes
                 </button>
