@@ -32,6 +32,11 @@ class Quiz extends Model
         return $this->hasMany(QuizAttempt::class, 'quiz_id');
     }
 
+    public function questions()
+    {
+        return $this->hasMany(QuizQuestion::class, 'quiz_id');
+    }
+
     /**
      * Quizzes in the given section that the student has not yet completed
      * (no attempt with a submitted_at timestamp on file).
@@ -65,5 +70,23 @@ class Quiz extends Model
         return $query
             ->whereHas('schedule', fn (Builder $q) => $q->where('teacher_id', $teacherId))
             ->whereNotNull('due_date');
+    }
+
+    /**
+     * Quizzes belonging to any of the given teacher's schedules — feeds the
+     * teacher quiz index. Mirrors Assignment::forTeacher().
+     */
+    public function scopeForTeacher(Builder $query, int $teacherId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('teacher_id', $teacherId));
+    }
+
+    /**
+     * Quizzes belonging to schedules in the given section — feeds the student
+     * quiz index. Mirrors Assignment::visibleToSection().
+     */
+    public function scopeVisibleToSection(Builder $query, int $sectionId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('section_id', $sectionId));
     }
 }

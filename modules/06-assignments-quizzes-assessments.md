@@ -151,17 +151,30 @@ SUBMISSION and QUIZ_ATTEMPT both feed into GRADE_COMPONENT (module 7) — keep t
 
 *(verified against the codebase, Sept 2026 — see `modules/README.md` for the project-wide table)*
 
-**Done:**
+**Done — Assignments (full teacher + student loop):**
+- `TeacherAssignmentController` (index w/ per-class filter + stats, create, edit, update, destroy, submissions list, grade, download) and `StudentAssignmentController` (index, submit) exist and are routed in `routes/web.php`.
+- Views are fully wired, not stubs: `teacher/assignments/{index,create,edit,submissions}.blade.php`, `student/assignments/index.blade.php` (submission upload form included).
+- Late-submission flag (`status = 'Late'` vs `'Submitted'`) computed server-side on submit; teacher grading sets `status = 'Graded'`.
+- Ownership authorization (a teacher may only manage assignments on their own schedules) and section-membership authorization (a student may only submit within their enrolled section) are enforced and covered by `tests/Feature/AssignmentLoopTest.php` (submit→grade loop, late flag, cross-section 403, cross-teacher 403).
 - Models `Assignment`, `Quiz`, `QuizAttempt`, `Submission` exist with `Assignment::pendingForStudent()` / `Quiz::pendingForStudent()` scopes — built as Module 16 (Student Dashboard) dependencies, and covered indirectly by `tests/Feature/StudentDashboardTest.php`.
 - `Assignment::forSectionCalendar()` / `Quiz::forSectionCalendar()` scopes (section-scoped, due-date-not-null) — built as a Module 9 (Calendar) dependency so assignment/quiz due dates surface on the student calendar, covered by `tests/Feature/CalendarControllerTest.php`.
 - `quizzes.due_date` column (migration `2026_09_24_000001_add_due_date_to_quizzes_table`) added so quizzes can appear on the calendar the same way assignments do.
 - `AssignmentSeeder` / `QuizSeeder` (wired into `DatabaseSeeder`) generate placeholder assignment/quiz rows against a demo section/schedule so the calendar has data to render out of the box.
 
-**Not started:**
-- No `AssignmentController`/`QuizController` — no teacher-facing UI to create assignments/quizzes, set due dates, or attach rubrics.
-- No student-facing "take a quiz" or "submit an assignment" flow — only the pending-count aggregation and calendar due-date display exist.
-- `teacher/assignments/index.blade.php` is an unwired stub; `student/assignments/index.blade.php` renders a real list (via `StudentDashboardController`) but has no submission form yet.
-- No rubric model/UI.
+**Done — Quizzes (full teacher + student loop):**
+- `TeacherQuizController` (index w/ per-class filter + stats, create, edit, update, destroy, attempts list, grade) and `StudentQuizController` (index, show/take, submit) exist and are routed in `routes/web.php`.
+- `QuizQuestion` Eloquent model added (`multiple_choice` / `true_false` / `short_answer`, `options` cast to array, `correct_answer`), with a case/whitespace-insensitive `isCorrect()` helper.
+- Views: `teacher/quizzes/{index,create,edit,attempts}.blade.php` (create/edit share a `_form` partial with an Alpine.js dynamic question builder), `student/quizzes/{index,take}.blade.php`.
+- Objective questions (`multiple_choice`/`true_false`) auto-grade on submit; a quiz containing any `short_answer` question leaves `score` null so it surfaces on the teacher's "awaiting review" queue instead of guessing.
+- Starting an attempt (`GET /student/quizzes/{quiz}`) is idempotent — revisiting resumes the same in-progress `QuizAttempt` row rather than creating duplicates; once `submitted_at` is set, re-taking is blocked (403), mirroring the assignment submission model (no resubmission — see the resubmission gap noted above, which still applies to quizzes).
+- Ownership authorization (teacher can only manage quizzes on their own schedules) and section-membership authorization (student can only take quizzes within their enrolled section) enforced and covered by `tests/Feature/QuizLoopTest.php`.
+
+**Not started — other:**
+- No rubric model/UI (needed for TVL/Arts & Design performance-task scoring called out in "Keep in mind" above).
+- No write path from a graded `Submission`/`QuizAttempt` into `grade_components` (see Module 7) — the `source_type`/`source_id` columns on `grade_components` exist for this but nothing populates them yet. This is the "explicit, versioned scoring contract" the Implementation Notes above call for; it still needs to be built.
+- No late-submission score penalty (only the `Late` status flag exists — flowchart's "apply penalty rule" step is not implemented).
+- No plagiarism detection.
+- `TeacherAssignmentController::index()` loads all of a teacher's assignments with `->get()` (no pagination), unlike `TeacherMaterialController::index()` which paginates — fine at current data volumes, revisit if a teacher accumulates many assignments across sections.
 
 ---
 

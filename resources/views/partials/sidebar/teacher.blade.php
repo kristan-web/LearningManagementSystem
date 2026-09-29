@@ -48,6 +48,9 @@
                   <a href="{{ url('/teacher/assignments') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">Assignments</a>
                </li>
                <li>
+                  <a href="{{ route('teacher.quizzes.index') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">Quizzes</a>
+               </li>
+               <li>
                   <a href="{{ url('/teacher/materials') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">Learning Materials</a>
                </li>
             </ul>
