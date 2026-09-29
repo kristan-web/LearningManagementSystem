@@ -6,9 +6,11 @@ use App\Http\Controllers\MaterialDownloadController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentMaterialController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\TeacherMaterialController;
 use App\Http\Controllers\WebAuthController;
@@ -59,9 +61,20 @@ Route::middleware('auth')->group(function () {
 		Route::put('/teacher/materials/{material}', [TeacherMaterialController::class, 'update'])->name('teacher.materials.update');
 		Route::delete('/teacher/materials/{material}', [TeacherMaterialController::class, 'destroy'])->name('teacher.materials.destroy');
 
+		Route::get('/teacher/assignments', [TeacherAssignmentController::class, 'index'])->name('teacher.assignments.index');
+		Route::get('/teacher/assignments/create', [TeacherAssignmentController::class, 'create'])->name('teacher.assignments.create');
+		Route::post('/teacher/assignments', [TeacherAssignmentController::class, 'store'])->name('teacher.assignments.store');
+		Route::get('/teacher/assignments/{assignment}/edit', [TeacherAssignmentController::class, 'edit'])->name('teacher.assignments.edit');
+		Route::put('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('teacher.assignments.update');
+		Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
+		Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
+		Route::put('/teacher/submissions/{submission}', [TeacherAssignmentController::class, 'grade'])->name('teacher.submissions.grade');
+		Route::get('/teacher/submissions/{submission}/download', [TeacherAssignmentController::class, 'download'])->name('teacher.submissions.download');
+
 		Route::get('/student/', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 		Route::get('/student/materials', [StudentMaterialController::class, 'index'])->name('student.materials.index');
-		Route::view('/student/assignments', 'student.assignments.index')->name('student.assignments.index');
+		Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
+		Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
 		Route::view('/student/quizzes', 'student.quizzes.index')->name('student.quizzes.index');
 		Route::get('/materials/{material}/download', [MaterialDownloadController::class, 'show'])->name('materials.download');
 		Route::get('/materials/{material}/preview', [MaterialDownloadController::class, 'preview'])->name('materials.preview');
