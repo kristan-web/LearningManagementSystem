@@ -3,10 +3,10 @@
 @section('title', 'Reset Password')
 
 @section('content')
-    <h1 class="text-center text-3xl font-extrabold tracking-tight text-slate-900">
-        Set a New <span class="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Password</span>
+    <h1 class="text-center font-display text-3xl font-bold tracking-[-.6px] text-ink">
+        Set a New <span class="bg-linear-to-r from-brand to-ink bg-clip-text text-transparent">Password</span>
     </h1>
-    <p class="mt-3 text-center text-sm font-medium text-slate-500">
+    <p class="mt-3 text-center text-sm font-medium text-ink/60">
         Choose a strong password you haven't used before.
     </p>
 
@@ -18,7 +18,7 @@
                 <div>
                     <label for="{{ $name }}" class="sr-only">{{ $label }}</label>
                     <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sky-500">
+                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-brand">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                 @if ($name === 'password')
                                     <rect x="5" y="11" width="14" height="10" rx="2"/>
@@ -30,8 +30,8 @@
                             </svg>
                         </span>
                         <input type="password" id="{{ $name }}" name="{{ $name }}" placeholder="{{ $label }}" required minlength="8" autocomplete="new-password" {{ $name === 'password' ? 'autofocus' : '' }}
-                               class="pw-input block w-full rounded-xl border border-sky-200 bg-white py-3 pl-11 pr-12 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-200/60">
-                        <button type="button" data-toggle="{{ $name }}" class="pw-toggle absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-sky-600 focus:outline-none focus-visible:text-sky-600" aria-label="Show password" aria-pressed="false">
+                               class="pw-input block w-full rounded-xl border border-ink/15 bg-white py-3 pl-11 pr-12 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15">
+                        <button type="button" data-toggle="{{ $name }}" class="pw-toggle absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-brand-deep focus:outline-none focus-visible:text-brand-deep" aria-label="Show password" aria-pressed="false">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
                                 <circle cx="12" cy="12" r="3"/>
@@ -59,14 +59,14 @@
         </div>
 
         <div class="mt-8 flex justify-center">
-            <button type="submit" id="reset-btn" class="w-48 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:from-sky-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-sky-300 active:scale-[.98] disabled:opacity-60">
+            <button type="submit" id="reset-btn" class="btn-navy w-48">
                 Reset password
             </button>
         </div>
     </form>
 
     <p class="mt-8 text-center">
-        <a href="{{ route('login') }}" class="text-sm font-semibold text-sky-700 underline underline-offset-4 hover:text-sky-900">Back to login</a>
+        <a href="{{ route('login') }}" class="text-sm font-semibold text-brand-deep underline underline-offset-4 hover:text-ink">Back to login</a>
     </p>
 @endsection
 

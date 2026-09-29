@@ -31,7 +31,7 @@
             display: block;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #374151;
+            color: #455072;
             margin-bottom: 0.375rem;
         }
         .form-group label.required::after {
@@ -45,15 +45,15 @@
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             font-size: 0.875rem;
-            color: #1f2937;
+            color: #16244f;
             background: #fff;
             transition: border-color 0.2s;
         }
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #8b5cf6;
-            ring: 2px solid #8b5cf6;
+            border-color: #2f5fd0;
+            ring: 2px solid #2f5fd0;
         }
         .form-group input::placeholder,
         .form-group select::placeholder {
@@ -67,7 +67,7 @@
         }
         .dark .form-group input:focus,
         .dark .form-group select:focus {
-            border-color: #8b5cf6;
+            border-color: #2f5fd0;
         }
         .dark .form-section {
             background: #1f2937;
@@ -99,36 +99,14 @@
             margin: 0 0 1rem 0;
             font-size: 1rem;
             font-weight: 600;
-            color: #1f2937;
-        }
-        .btn-submit {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            background: #8b5cf6;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s, opacity 0.2s;
-        }
-        .btn-submit:hover:not(:disabled) {
-            background: #7c3aed;
-        }
-        .btn-submit:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-            background: #8b5cf6;
+            color: #16244f;
         }
         .btn-cancel {
             display: inline-flex;
             align-items: center;
             padding: 0.625rem 1.25rem;
             background: #fff;
-            color: #374151;
+            color: #455072;
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             font-size: 0.875rem;
@@ -160,7 +138,7 @@
             display: flex;
         }
         .password-toggle:hover {
-            color: #fff;
+            color: #2f5fd0;
         }
         .password-strength {
             height: 4px;
@@ -204,7 +182,7 @@
             display: flex;
         }
         .confirm-password-toggle:hover {
-            color: #fff;
+            color: #2f5fd0;
         }
         .password-match-msg {
             font-size: 0.75rem;
@@ -267,7 +245,7 @@
             word-break: break-word;
         }
         .confirm-create-modal__section-title {
-            color: #8b5cf6;
+            color: #8fb0f5;
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -298,11 +276,11 @@
             background: #fff;
         }
         .role-option:hover {
-            border-color: #8b5cf6;
+            border-color: #2f5fd0;
         }
         .role-option.selected {
-            border-color: #8b5cf6;
-            background: #f5f3ff;
+            border-color: #2f5fd0;
+            background: #f0f4fd;
         }
         .role-option input[type="radio"] {
             display: none;
@@ -312,10 +290,10 @@
             font-weight: 500;
             cursor: pointer;
             display: block;
-            color: #374151;
+            color: #455072;
         }
         .role-option.selected label {
-            color: #7c3aed;
+            color: #16244f;
         }
         #student-fields, #teacher-fields {
             display: none;
@@ -338,8 +316,8 @@
     <div class="create-form-container">
         <div class="flex items-center justify-between mb-4">
             <div class="chart-center">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Account</h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Update account details for {{ trim($user->first_name . ' ' . $user->last_name) }}.</p>
+                <h1 class="text-2xl font-bold text-ink dark:text-white">Edit Account</h1>
+                <p class="mt-1 text-sm text-ink/60 dark:text-gray-400">Update account details for {{ trim($user->first_name . ' ' . $user->last_name) }}.</p>
             </div>
         </div>
 
@@ -544,7 +522,7 @@
             {{-- Form Actions --}}
             <div class="flex items-center justify-end gap-3 pt-4">
                 <a href="{{ route('admin.users.index') }}" class="btn-cancel">Cancel</a>
-                <button type="button" id="reviewBtn" class="btn-submit">
+                <button type="button" id="reviewBtn" class="btn-navy">
                     <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
                     Review & Update Account
                 </button>
@@ -563,7 +541,7 @@
                 </div>
                 <div class="confirm-create-modal__actions">
                     <button type="button" class="btn-cancel" id="confirmCreateCancel">Back to Edit</button>
-                    <button type="button" class="btn-submit" id="confirmCreateConfirm">
+                    <button type="button" class="btn-navy" id="confirmCreateConfirm">
                         <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                         Confirm & Update
                     </button>

@@ -3,11 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{{ asset('images/Enrollment logo.png') }}">
     <title>{{ config('app.name', 'Flowbite') }} - Login</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
+    <!-- Fonts (same as the landing page) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -136,20 +138,20 @@
         /* Owl speech bubble */
         .owl-bubble {
             position: absolute; top: 100%; right: .25rem; margin-top: .25rem;
-            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #e0f2fe;
-            background: #fff; color: #075985; font-size: .75rem; font-weight: 600; white-space: nowrap;
-            box-shadow: 0 10px 24px -10px rgba(2, 132, 199, .5);
+            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #dbe5fb;
+            background: #fff; color: #16244f; font-size: .75rem; font-weight: 600; white-space: nowrap;
+            box-shadow: 0 10px 24px -10px rgba(22, 36, 79, .45);
             opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: top right; pointer-events: none;
             transition: opacity .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
         }
         .owl-bubble::after {
             content: ""; position: absolute; top: -6px; right: 1.75rem; width: 10px; height: 10px;
-            background: #fff; border-left: 1px solid #e0f2fe; border-top: 1px solid #e0f2fe; transform: rotate(45deg);
+            background: #fff; border-left: 1px solid #dbe5fb; border-top: 1px solid #dbe5fb; transform: rotate(45deg);
         }
         .owl-bubble.show { opacity: 1; transform: none; }
         @media (min-width: 640px) {
             .owl-bubble { top: 1.75rem; right: 100%; margin: 0 .5rem 0 0; transform: translateX(4px) scale(.9); transform-origin: right center; }
-            .owl-bubble::after { top: 50%; right: -6px; margin-top: -5px; border: 0; border-top: 1px solid #e0f2fe; border-right: 1px solid #e0f2fe; }
+            .owl-bubble::after { top: 50%; right: -6px; margin-top: -5px; border: 0; border-top: 1px solid #dbe5fb; border-right: 1px solid #dbe5fb; }
         }
         @media (prefers-reduced-motion: reduce) {
             .owl * { animation: none !important; transition: none !important; }
@@ -157,7 +159,7 @@
         }
     </style>
 </head>
-<body class="login-bg min-h-screen antialiased">
+<body class="login-bg min-h-screen font-jakarta text-ink antialiased selection:bg-gold/30">
     {{-- Decorative background --}}
     <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
         {{-- Realistic clouds: soft shapes roughened by fractal noise, bluish underside peeks below --}}
@@ -197,8 +199,9 @@
         <div class="relative flex flex-col w-full">
 
             {{-- Brand --}}
-            <a href="{{ url('/') }}" class="absolute top-2 left-2 sm:top-3 sm:left-6">
-                <img src="{{ asset('images/logo.png') }}" alt="LMS Admin" class="h-14 sm:h-[4.5rem] w-auto">
+            {{-- Sized and placed to mirror the owl on the right --}}
+            <a href="{{ route('landing') }}" class="absolute top-4 left-4 sm:top-6 sm:left-10" aria-label="Enrollment Management System home">
+                <img src="{{ asset('images/Enrollment logo.png') }}" alt="Enrollment Management System logo" class="w-20 sm:w-28 lg:w-32 h-auto">
             </a>
 
             {{-- Owl mascot: eyes follow the cursor, covers eyes on password --}}
@@ -207,21 +210,21 @@
                 <svg id="owl" class="owl block w-20 sm:w-28 lg:w-32 h-auto cursor-pointer" viewBox="0 0 160 150">
                     <defs>
                         <radialGradient id="owl-g-body" cx="40%" cy="30%" r="75%">
-                            <stop offset="0" stop-color="#38bdf8"/>
-                            <stop offset=".55" stop-color="#0284c7"/>
-                            <stop offset="1" stop-color="#075985"/>
+                            <stop offset="0" stop-color="#5b84e6"/>
+                            <stop offset=".55" stop-color="#2f5fd0"/>
+                            <stop offset="1" stop-color="#16244f"/>
                         </radialGradient>
                         <radialGradient id="owl-g-belly" cx="50%" cy="30%" r="75%">
                             <stop offset="0" stop-color="#ffffff"/>
-                            <stop offset="1" stop-color="#bae6fd"/>
+                            <stop offset="1" stop-color="#dbe5fb"/>
                         </radialGradient>
                         <radialGradient id="owl-g-eye" cx="45%" cy="40%" r="60%">
                             <stop offset=".7" stop-color="#ffffff"/>
                             <stop offset="1" stop-color="#dbeafe"/>
                         </radialGradient>
                         <linearGradient id="owl-g-wing" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0" stop-color="#0284c7"/>
-                            <stop offset="1" stop-color="#0c4a6e"/>
+                            <stop offset="0" stop-color="#2f5fd0"/>
+                            <stop offset="1" stop-color="#16244f"/>
                         </linearGradient>
                         <linearGradient id="owl-g-beak" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0" stop-color="#fcd34d"/>
@@ -229,7 +232,7 @@
                         </linearGradient>
                     </defs>
 
-                    <ellipse class="owl-shadow" cx="80" cy="146" rx="34" ry="3.5" fill="#0c4a6e" opacity=".18"/>
+                    <ellipse class="owl-shadow" cx="80" cy="146" rx="34" ry="3.5" fill="#16244f" opacity=".18"/>
 
                     <g class="owl-float">
                         <g class="owl-hop">
@@ -246,17 +249,17 @@
 
                                 <g class="owl-tilt">
                                     {{-- Ear tufts + body --}}
-                                    <path d="M40 58C30 48 27 36 29 26c9 6 19 14 26 24Z" fill="#075985"/>
-                                    <path d="M120 58c10-10 13-22 11-32-9 6-19 14-26 24Z" fill="#075985"/>
+                                    <path d="M40 58C30 48 27 36 29 26c9 6 19 14 26 24Z" fill="#1e46a8"/>
+                                    <path d="M120 58c10-10 13-22 11-32-9 6-19 14-26 24Z" fill="#1e46a8"/>
                                     <ellipse cx="80" cy="92" rx="52" ry="47" fill="url(#owl-g-body)"/>
                                     <ellipse cx="80" cy="110" rx="32" ry="27" fill="url(#owl-g-belly)"/>
-                                    <path d="M66 104q4 4 8 0m4 0q4 4 8 0m4 0q4 4 8 0M72 114q4 4 8 0m4 0q4 4 8 0M76 124q4 4 8 0" stroke="#7dd3fc" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                    <path d="M66 104q4 4 8 0m4 0q4 4 8 0m4 0q4 4 8 0M72 114q4 4 8 0m4 0q4 4 8 0M76 124q4 4 8 0" stroke="#a9bff0" stroke-width="2" fill="none" stroke-linecap="round"/>
 
                                     {{-- Face --}}
-                                    <circle cx="58" cy="74" r="25" fill="#7dd3fc" opacity=".3"/>
-                                    <circle cx="102" cy="74" r="25" fill="#7dd3fc" opacity=".3"/>
-                                    <circle cx="58" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#0c4a6e" stroke-opacity=".25" stroke-width="2"/>
-                                    <circle cx="102" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#0c4a6e" stroke-opacity=".25" stroke-width="2"/>
+                                    <circle cx="58" cy="74" r="25" fill="#a9bff0" opacity=".3"/>
+                                    <circle cx="102" cy="74" r="25" fill="#a9bff0" opacity=".3"/>
+                                    <circle cx="58" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#16244f" stroke-opacity=".25" stroke-width="2"/>
+                                    <circle cx="102" cy="74" r="20" fill="url(#owl-g-eye)" stroke="#16244f" stroke-opacity=".25" stroke-width="2"/>
                                     <g class="owl-pupil" data-cx="58" data-cy="74">
                                         <circle cx="58" cy="74" r="9.5" fill="#0f172a"/>
                                         <circle cx="61.5" cy="70" r="3.2" fill="#fff"/>
@@ -279,10 +282,10 @@
                                         <path class="owl-spiral" style="transform-origin: 59.5px 74px" d="M58 74a1.5 1.5 0 0 1 3 0 3 3 0 0 1-6 0 4.5 4.5 0 0 1 9 0 6 6 0 0 1-12 0 7.5 7.5 0 0 1 15 0"/>
                                         <path class="owl-spiral" style="transform-origin: 103.5px 74px" d="M102 74a1.5 1.5 0 0 1 3 0 3 3 0 0 1-6 0 4.5 4.5 0 0 1 9 0 6 6 0 0 1-12 0 7.5 7.5 0 0 1 15 0"/>
                                     </g>
-                                    <circle class="owl-lid owl-lid-l" cx="58" cy="74" r="21" fill="#0284c7" style="transform-origin: 58px 53px"/>
-                                    <circle class="owl-lid owl-lid-r" cx="102" cy="74" r="21" fill="#0284c7" style="transform-origin: 102px 53px"/>
-                                    <path class="owl-brow owl-brow-l" d="M44 50q13-7 26-1" stroke="#0c4a6e" stroke-width="4" fill="none" stroke-linecap="round"/>
-                                    <path class="owl-brow owl-brow-r" d="M90 49q13-6 26 1" stroke="#0c4a6e" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                    <circle class="owl-lid owl-lid-l" cx="58" cy="74" r="21" fill="#2f5fd0" style="transform-origin: 58px 53px"/>
+                                    <circle class="owl-lid owl-lid-r" cx="102" cy="74" r="21" fill="#2f5fd0" style="transform-origin: 102px 53px"/>
+                                    <path class="owl-brow owl-brow-l" d="M44 50q13-7 26-1" stroke="#16244f" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                    <path class="owl-brow owl-brow-r" d="M90 49q13-6 26 1" stroke="#16244f" stroke-width="4" fill="none" stroke-linecap="round"/>
                                     <ellipse class="owl-cheek" cx="49" cy="99" rx="5.5" ry="3.2" fill="#fb7185"/>
                                     <ellipse class="owl-cheek" cx="111" cy="99" rx="5.5" ry="3.2" fill="#fb7185"/>
                                     <ellipse class="owl-mouth" cx="80" cy="99" rx="4.5" ry="5" fill="#9a3412"/>
@@ -304,13 +307,13 @@
                                     <g class="owl-wing owl-wing-l" style="transform-origin: 34px 100px">
                                         <g class="owl-flap owl-flap-l">
                                             <ellipse cx="34" cy="100" rx="14" ry="26" fill="url(#owl-g-wing)"/>
-                                            <path d="M28 96q6 4 12 0M28 106q6 4 12 0M30 116q5 3 9 0" stroke="#38bdf8" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                            <path d="M28 96q6 4 12 0M28 106q6 4 12 0M30 116q5 3 9 0" stroke="#8fb0f5" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
                                         </g>
                                     </g>
                                     <g class="owl-wing owl-wing-r" style="transform-origin: 126px 100px">
                                         <g class="owl-flap owl-flap-r">
                                             <ellipse cx="126" cy="100" rx="14" ry="26" fill="url(#owl-g-wing)"/>
-                                            <path d="M120 96q6 4 12 0M120 106q6 4 12 0M121 116q5 3 9 0" stroke="#38bdf8" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                            <path d="M120 96q6 4 12 0M120 106q6 4 12 0M121 116q5 3 9 0" stroke="#8fb0f5" stroke-opacity=".45" stroke-width="1.8" fill="none" stroke-linecap="round"/>
                                         </g>
                                     </g>
                                 </g>
@@ -323,12 +326,12 @@
                             <path class="owl-heart" d="M136 50l-7-7a3.5 3.5 0 0 1 7-4 3.5 3.5 0 0 1 7 4Z"/>
                             <path class="owl-heart" d="M108 10l-5-5a2.5 2.5 0 0 1 5-3 2.5 2.5 0 0 1 5 3Z"/>
                         </g>
-                        <g class="owl-zzz" fill="#0369a1" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="800">
+                        <g class="owl-zzz" fill="#1e46a8" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="800">
                             <text x="122" y="48" font-size="12">z</text>
                             <text x="122" y="48" font-size="15">Z</text>
                             <text x="122" y="48" font-size="18">Z</text>
                         </g>
-                        <text class="owl-mark owl-q" x="130" y="40" fill="#0369a1" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">?</text>
+                        <text class="owl-mark owl-q" x="130" y="40" fill="#1e46a8" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">?</text>
                         <text class="owl-mark owl-ex" x="132" y="40" fill="#f59e0b" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="800">!</text>
                     </g>
                 </svg>
@@ -336,8 +339,8 @@
 
             <div class="flex flex-1 items-center justify-center px-6 py-24">
                 <div class="w-full max-w-sm">
-                    <h1 class="text-center text-3xl font-extrabold tracking-tight text-slate-900">
-                        Login to Your <span class="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Account</span>
+                    <h1 class="text-center font-display text-3xl font-bold tracking-[-.6px] text-ink">
+                        Login to Your <span class="bg-linear-to-r from-brand to-ink bg-clip-text text-transparent">Account</span>
                     </h1>
 
                     {{-- Session Status --}}
@@ -396,7 +399,7 @@
                             <div>
                                 <label for="email" class="sr-only">Email</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sky-500">
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-brand">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                             <rect x="3" y="5" width="18" height="14" rx="2"/>
                                             <path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -406,7 +409,7 @@
                                            name="email"
                                            id="email"
                                            value="{{ old('email') ?? old('identifier') }}"
-                                           class="block w-full rounded-xl border border-sky-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-200/60"
+                                           class="block w-full rounded-xl border border-ink/15 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15"
                                            placeholder="Email"
                                            required
                                            autofocus
@@ -417,7 +420,7 @@
                             <div>
                                 <label for="password" class="sr-only">Password</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sky-500">
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-brand">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                                             <rect x="5" y="11" width="14" height="10" rx="2"/>
                                             <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round"/>
@@ -427,12 +430,12 @@
                                            name="password"
                                            id="password"
                                            placeholder="Password"
-                                           class="block w-full rounded-xl border border-sky-200 bg-white py-3 pl-11 pr-12 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-200/60"
+                                           class="block w-full rounded-xl border border-ink/15 bg-white py-3 pl-11 pr-12 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15"
                                            required
                                            autocomplete="current-password">
                                     <button type="button"
                                             id="toggle-password"
-                                            class="group absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-sky-600 focus:outline-none focus-visible:text-sky-600"
+                                            class="group absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-brand-deep focus:outline-none focus-visible:text-brand-deep"
                                             aria-label="Show password"
                                             aria-pressed="false">
                                         <svg class="w-5 h-5 transition-transform duration-200 group-active:scale-90" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
@@ -452,19 +455,19 @@
                                    name="remember"
                                    aria-describedby="remember"
                                    type="checkbox"
-                                   class="w-4 h-4 rounded border-gray-300 text-sky-600 focus:ring-sky-300"
+                                   class="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand/30"
                                    {{ old('remember') ? 'checked' : '' }}>
-                            <label for="remember" class="ml-2 text-sm font-medium text-slate-700 cursor-pointer select-none">Remember me</label>
+                            <label for="remember" class="ml-2 text-sm font-medium text-ink/70 cursor-pointer select-none">Remember me</label>
                         </div>
 
                         <div class="mt-10 flex justify-center">
-                            <button type="submit" class="w-40 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:from-sky-600 hover:to-blue-700 hover:shadow-sky-500/40 focus:outline-none focus:ring-4 focus:ring-sky-300 active:scale-[.98]">
+                            <button type="submit" class="btn-navy w-40">
                                 Login
                             </button>
                         </div>
 
                         <p class="mt-8 text-center">
-                            <a href="{{ route('otp') }}" class="text-sm font-semibold text-sky-700 underline underline-offset-4 hover:text-sky-900">Forgot password?</a>
+                            <a href="{{ route('otp') }}" class="text-sm font-semibold text-brand-deep underline underline-offset-4 hover:text-ink">Forgot password?</a>
                         </p>
                     </form>
                 </div>

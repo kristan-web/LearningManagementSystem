@@ -6,28 +6,28 @@
 @section('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.css" />
     <style>
-       /* Theme tokens: light mode (default) uses the light blue palette, html.dark switches to dark. */
+       /* Theme tokens: light mode (default) uses the landing/login navy palette (ink #16244f, brand #2f5fd0), html.dark switches to navy dark. */
        .admin-dashboard-content {
-          --card-bg: linear-gradient(160deg, #ffffff 0%, #f0f7ff 100%);
-          --card-border: #dbeafe;
-          --card-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(37 99 235 / 0.18);
-          --card-text: #0f172a;
-          --card-label: #2563eb;
-          --card-muted: #64748b;
-          --card-grid: #e2e8f0;
-          --fallback-bg: #f8fafc;
-          --fallback-border: #cbd5e1;
+          --card-bg: linear-gradient(160deg, #ffffff 0%, #f7f9fe 100%);
+          --card-border: #e3e8f4;
+          --card-shadow: 0 1px 2px rgb(22 36 79 / 0.04), 0 8px 24px -12px rgb(22 36 79 / 0.16);
+          --card-text: #16244f;
+          --card-label: #1e46a8;
+          --card-muted: #737c95;
+          --card-grid: #e8ecf5;
+          --fallback-bg: #f7f9fe;
+          --fallback-border: #d5dcec;
        }
        html.dark .admin-dashboard-content {
-          --card-bg: #120f17;
-          --card-border: #2f293a;
+          --card-bg: #0f1a38;
+          --card-border: #24386f;
           --card-shadow: none;
           --card-text: #ffffff;
-          --card-label: #c4b5fd;
-          --card-muted: #c4bdca;
-          --card-grid: #2f293a;
-          --fallback-bg: rgba(12, 11, 19, 0.8);
-          --fallback-border: #374151;
+          --card-label: #a9bff0;
+          --card-muted: #aab4cf;
+          --card-grid: #24386f;
+          --fallback-bg: rgba(15, 26, 56, 0.8);
+          --fallback-border: #24386f;
        }
 
       .total_nam { color: #ffffff !important; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; text-shadow: 2px 2px 4px #000; }
@@ -56,7 +56,7 @@
        }
        .admin-bento-card:hover { transform: translateY(-2px); }
        .admin-bento-card__label { color: var(--card-label); font-size: 0.875rem; font-weight: 500; }
-       .admin-bento-card__title { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 600; }
+       .admin-bento-card__title { margin: 0 0 0.25rem; font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 700; }
        .admin-bento-card__description { margin: 0; color: var(--card-muted); font-size: 0.75rem; line-height: 1.2; }
        .admin-bento-card__total { margin-top: 0.5rem; font-size: 0.75rem; color: var(--card-muted); }
 
@@ -87,7 +87,7 @@
        .admin-bento-card__chart-wrap { min-height: 220px; width: 100%; position: relative; }
        .admin-bento-card__chart-wrap .apexcharts-canvas { width: 100% !important; }
     .admin-subject-count { position: absolute; top: 50%; left: 50%; z-index: 2; text-align: center; transform: translate(-50%, -50%); pointer-events: none; }
-    .admin-subject-count__value { color: #fff; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1; letter-spacing: 0; text-shadow: 0 0 24px rgb(139 92 246 / 0.45); }
+    .admin-subject-count__value { color: #fff; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1; letter-spacing: 0; text-shadow: 0 0 24px rgb(47 95 208 / 0.55); }
     .admin-subject-count__label { margin-top: 0.5rem; color: #c4b5fd; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
        .admin-bento-card__fallback { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 0.5rem; color: var(--card-label); font-size: 0.85rem; text-align: center; min-height: 220px; background: var(--fallback-bg); border: 1px dashed var(--fallback-border); border-radius: 0.75rem; }
        .admin-bento-card__fallback svg { width: 40px; height: 40px; opacity: 0.4; }
@@ -112,8 +112,8 @@
 @section('content')
 <div class="admin-dashboard-content">
         <div class="chart-center">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"> Overview of the learning management system.</p>
+            <h1 class="font-display text-2xl font-bold tracking-[-.4px] text-ink dark:text-white">Dashboard</h1>
+            <p class="mt-1 text-sm text-ink/60 dark:text-gray-400"> Overview of the learning management system.</p>
         </div>
 <div class="admin-bento-grid">
 
@@ -190,7 +190,8 @@
         const enrollmentTrendsData = {!! json_encode($enrollmentTrends) !!};
         const studentsByCreatedAt = {!! json_encode($studentsByCreatedAt) !!};
         const subjectsByTypeData = {!! json_encode($subjectsByType) !!};
-        const chartColors = ['#8b5cf6','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#06b6d4','#84cc16'];
+        // Landing/login palette: brand blue, navy, gold, deep orange, then lighter tints
+        const chartColors = ['#2f5fd0','#16244f','#f4b301','#c85a08','#5b84e6','#16a34a','#8fb0f5','#ef4444'];
         const darkText = '#c4b5fd';
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -234,7 +235,7 @@
             (function() {
                 const d = usersByRoleData;
                 new ApexCharts(document.getElementById('chart-users-role'), {
-                    chart: { type: 'donut', height: 220, width: '100%', fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                    chart: { type: 'donut', height: 220, width: '100%', fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                     labels: d.map(x => x.role),
                     series: d.map(x => x.total),
                     colors: chartColors,
@@ -248,10 +249,10 @@
             (function() {
                 const d = teachersBySpecializationData;
                 new ApexCharts(document.getElementById('chart-attendance'), {
-                    chart: { type: 'pie', height: 220, width: '100%', fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                    chart: { type: 'pie', height: 220, width: '100%', fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                     labels: d.map(x => x.specialization),
                     series: d.map(x => x.total),
-                    colors: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981'],
+                    colors: ['#2f5fd0', '#16244f', '#f4b301', '#c85a08'],
                     legend: { position: 'bottom', labels: { colors: darkText, fontSize: '11px' } },
                     noData: { text: 'No teacher data', align: 'center', verticalAlign: 'middle', style: { color: '#c4b5fd', fontSize: '14px' } },
                     responsive: [{ breakpoint: 640, options: { chart: { height: 220 } } }]
@@ -263,7 +264,7 @@
                 const d = studentsByCreatedAt;
                 const periods = [...new Set(d.map(x => x.period))].sort();
                 const gradeLevels = [...new Set(d.map(x => x.grade_level))].sort();
-                const gradeColors = ['#8b5cf6', '#ec4899'];
+                const gradeColors = ['#2f5fd0', '#f4b301'];
                 const series = gradeLevels.map(function(grade, i) {
                     return {
                         name: 'Grade ' + grade,
@@ -275,7 +276,7 @@
                     };
                 });
                 new ApexCharts(document.getElementById('chart-students'), {
-                    chart: { type: 'bar', height: 200, fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                    chart: { type: 'bar', height: 200, fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                     tooltip: { theme: 'light' },
                     plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: '40%' } },
                     xaxis: { categories: periods, labels: { style: { colors: darkText } }, axisBorder: { show: false }, axisTicks: { color: '#2f293a' } },
@@ -293,12 +294,12 @@
                 const labels = d.map(x => x.school_year);
                 const data = d.map(x => x.total);
                 new ApexCharts(document.getElementById('chart-enrollments'), {
-                    chart: { type: 'area', height: 200, fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                    chart: { type: 'area', height: 200, fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                     tooltip: { theme: 'light' },
                     stroke: { curve: 'smooth', width: 3 },
                     xaxis: { categories: labels, labels: { style: { colors: darkText } }, axisBorder: { show: false }, axisTicks: { color: '#2f293a' } },
                     yaxis: { labels: { style: { colors: darkText } } },
-                    colors: ['#8b5cf6'],
+                    colors: ['#2f5fd0'],
                     series: [{ name: 'Enrollments', data: data }],
                     fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } },
                     legend: { position: 'bottom', labels: { colors: darkText, fontSize: '11px' } },
@@ -311,11 +312,11 @@
                 const d = subjectsByTypeData;
                 const total = d.reduce(function(a, b) { return a + b.total; }, 0);
                 new ApexCharts(document.getElementById('chart-subjects'), {
-                    chart: { type: 'bar', height: 200, fontFamily: 'Instrument Sans', background: 'transparent', toolbar: { show: false } },
+                    chart: { type: 'bar', height: 200, fontFamily: 'Plus Jakarta Sans', background: 'transparent', toolbar: { show: false } },
                     plotOptions: { bar: { borderRadius: 6, horizontal: true, columnWidth: '50%' } },
                     xaxis: { categories: d.map(x => x.subject_type), labels: { style: { colors: darkText } }, axisBorder: { show: false }, axisTicks: { color: '#2f293a' } },
                     yaxis: { labels: { style: { colors: darkText } } },
-                    colors: ['#8b5cf6', '#f59e0b', '#10b981'],
+                    colors: ['#2f5fd0', '#f4b301', '#16244f'],
                     legend: { position: 'bottom', labels: { colors: darkText, fontSize: '11px' } },
                     title: { text: 'Total: ' + total + ' subjects', align: 'center', style: { color: darkText, fontSize: '12px' } },
                     noData: { text: 'No subject data', align: 'center', verticalAlign: 'middle', style: { color: '#c4b5fd', fontSize: '14px' } },
