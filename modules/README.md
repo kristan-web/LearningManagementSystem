@@ -22,7 +22,7 @@ models, migrations, routes, views, tests) — not inferred from the docs.
 
 | # | Module | Doc | Status | Notes |
 |---|--------|-----|--------|-------|
-| 01 | User & Role Management | [01-user-role-management.md](./01-user-role-management.md) | 🚧 In progress | Login, forced password change (tested), admin user CRUD all real. Self-service registration/reset was removed from the codebase. No Policies/Gates yet; `Guardian` model missing. |
+| 01 | User & Role Management | [01-user-role-management.md](./01-user-role-management.md) | 🚧 In progress | Login, forced password change (tested), admin user CRUD, and self-service Teacher/Student profile editing (`ProfileController`, tested, 8/8 passing) all real. Self-service registration/reset (account creation) was removed from the codebase — profile *editing* is not the same as account creation and remains Admin-provisioned. No Policies/Gates yet; `Guardian` model missing. |
 | 02 | Enrollment & Academic Structure | [02-enrollment-academic-structure.md](./02-enrollment-academic-structure.md) | 🚧 In progress | `EnrollmentController` + `SubjectController` are full working admin CRUD. `Strand::track()` references a nonexistent `Track` model (bug). Student-facing enrollment view is a stub. |
 | 03 | Class & Scheduling | [03-class-scheduling.md](./03-class-scheduling.md) | 🚧 In progress | `Schedule` model only (built as Module 16 plumbing). No controller/UI, no conflict detection, no `Room` model. |
 | 04 | Attendance | [04-attendance.md](./04-attendance.md) | ⏳ Not started | Table exists via migration only. No model, controller, or wired view. |

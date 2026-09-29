@@ -78,6 +78,20 @@ class TeacherAssignmentController extends Controller
         return redirect()->route('teacher.assignments.index')->with('success', 'Assignment created successfully.');
     }
 
+    public function show(Request $request, Assignment $assignment): View
+    {
+        $teacher = $this->authorizedTeacher($request);
+        $this->authorizeOwnership($assignment, $teacher->teacher_id);
+
+        $assignment->load(['schedule.subject', 'schedule.section', 'comments'])
+            ->loadCount([
+                'submissions',
+                'submissions as awaiting_grading_count' => fn ($q) => $q->whereIn('status', ['Submitted', 'Late']),
+            ]);
+
+        return view('teacher.assignments.show', compact('assignment'));
+    }
+
     public function edit(Request $request, Assignment $assignment): View
     {
         $teacher = $this->authorizedTeacher($request);

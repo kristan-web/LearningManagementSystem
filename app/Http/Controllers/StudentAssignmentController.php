@@ -38,6 +38,20 @@ class StudentAssignmentController extends Controller
         return view('student.assignments.index', compact('assignments'));
     }
 
+    public function show(Request $request, Assignment $assignment): View
+    {
+        abort_unless($request->user()->role === 'Student', 403);
+        abort_unless($assignment->isAccessibleBy($request->user()), 403);
+
+        $student = Student::where('user_id', $request->user()->user_id)->firstOrFail();
+        $assignment->load(['schedule.subject', 'comments']);
+        $submission = Submission::where('assignment_id', $assignment->assignment_id)
+            ->where('student_id', $student->student_id)
+            ->first();
+
+        return view('student.assignments.show', compact('assignment', 'submission'));
+    }
+
     public function submit(Request $request, Assignment $assignment): RedirectResponse
     {
         abort_unless($request->user()->role === 'Student', 403);

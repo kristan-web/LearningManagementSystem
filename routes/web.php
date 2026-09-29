@@ -1,18 +1,24 @@
 <?php
 
+use App\Http\Controllers\AssignmentCommentController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\MaterialDownloadController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordChangeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentMaterialController;
+use App\Http\Controllers\StudentQuizController;
+use App\Http\Controllers\StudentScheduleController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\TeacherMaterialController;
+use App\Http\Controllers\TeacherQuizController;
+use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\WebAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +61,9 @@ Route::middleware('auth')->group(function () {
 	Route::put('/password/change', [PasswordChangeController::class, 'update'])->name('password.change.update');
 
 	Route::middleware('password.changed')->group(function () {
+		Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+		Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
 		Route::get('/teacher/', [TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
 		Route::get('/teacher/materials', [TeacherMaterialController::class, 'index'])->name('teacher.materials.index');
 		Route::post('/teacher/materials', [TeacherMaterialController::class, 'store'])->name('teacher.materials.store');
@@ -68,14 +77,31 @@ Route::middleware('auth')->group(function () {
 		Route::put('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('teacher.assignments.update');
 		Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
 		Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
+		Route::get('/teacher/assignments/{assignment}/view', [TeacherAssignmentController::class, 'show'])->name('teacher.assignments.show');
 		Route::put('/teacher/submissions/{submission}', [TeacherAssignmentController::class, 'grade'])->name('teacher.submissions.grade');
 		Route::get('/teacher/submissions/{submission}/download', [TeacherAssignmentController::class, 'download'])->name('teacher.submissions.download');
 
+		Route::get('/teacher/quizzes', [TeacherQuizController::class, 'index'])->name('teacher.quizzes.index');
+		Route::get('/teacher/quizzes/create', [TeacherQuizController::class, 'create'])->name('teacher.quizzes.create');
+		Route::post('/teacher/quizzes', [TeacherQuizController::class, 'store'])->name('teacher.quizzes.store');
+		Route::delete('/teacher/quizzes/{quiz}', [TeacherQuizController::class, 'destroy'])->name('teacher.quizzes.destroy');
+
+		Route::get('/teacher/schedule', [TeacherScheduleController::class, 'index'])->name('teacher.schedule.index');
+
 		Route::get('/student/', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 		Route::get('/student/materials', [StudentMaterialController::class, 'index'])->name('student.materials.index');
+		Route::get('/student/materials/{subject}', [StudentMaterialController::class, 'show'])->name('student.materials.show');
 		Route::get('/student/assignments', [StudentAssignmentController::class, 'index'])->name('student.assignments.index');
+		Route::get('/student/assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('student.assignments.show');
 		Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
-		Route::view('/student/quizzes', 'student.quizzes.index')->name('student.quizzes.index');
+		Route::get('/student/schedule', [StudentScheduleController::class, 'index'])->name('student.schedule.index');
+
+		Route::post('/assignments/{assignment}/comments', [AssignmentCommentController::class, 'store'])->name('assignments.comments.store');
+		Route::delete('/assignments/{assignment}/comments/{comment}', [AssignmentCommentController::class, 'destroy'])->name('assignments.comments.destroy');
+		Route::get('/student/quizzes', [StudentQuizController::class, 'index'])->name('student.quizzes.index');
+		Route::get('/student/quizzes/{quiz}/take', [StudentQuizController::class, 'take'])->name('student.quizzes.take');
+		Route::post('/student/quizzes/{quiz}/attempts/{attempt}/submit', [StudentQuizController::class, 'submit'])->name('student.quizzes.submit');
+		Route::get('/student/quizzes/{quiz}/attempts/{attempt}/results', [StudentQuizController::class, 'results'])->name('student.quizzes.results');
 		Route::get('/materials/{material}/download', [MaterialDownloadController::class, 'show'])->name('materials.download');
 		Route::get('/materials/{material}/preview', [MaterialDownloadController::class, 'preview'])->name('materials.preview');
 		Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');

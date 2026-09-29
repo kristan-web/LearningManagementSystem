@@ -84,7 +84,12 @@ public function test_student_sees_only_published_materials_for_own_section(): vo
         $response = $this->actingAs($user)->get('/student/materials');
 
         $response->assertOk();
-        $titles = $response->viewData('materialsBySubject')->flatten(1)->pluck('title');
+        $subjects = $response->viewData('subjects');
+        $this->assertCount(1, $subjects);
+        $this->assertSame(1, $subjects->first()->count);
+
+        $showResponse = $this->actingAs($user)->get("/student/materials/{$schedule->subject_id}");
+        $titles = $showResponse->viewData('materials')->pluck('title');
         $this->assertTrue($titles->contains('Published Module'));
         $this->assertFalse($titles->contains('Draft Module'));
     }
@@ -101,8 +106,35 @@ public function test_student_sees_only_published_materials_for_own_section(): vo
 
         $response = $this->actingAs($user)->get('/student/materials');
 
-        $titles = $response->viewData('materialsBySubject')->flatten(1)->pluck('title');
-        $this->assertFalse($titles->contains('Other Section Module'));
+        $this->assertCount(0, $response->viewData('subjects'));
+    }
+
+    public function test_student_can_view_materials_for_own_subject(): void
+    {
+        [$user, , , $schedule] = $this->actingStudent();
+
+        LearningMaterial::create([
+            'schedule_id' => $schedule->schedule_id, 'title' => 'Published Module', 'status' => 'Published',
+            'file_url' => 'learning_materials/1/pub.pdf', 'uploaded_by' => $user->user_id,
+        ]);
+
+        $response = $this->actingAs($user)->get("/student/materials/{$schedule->subject_id}");
+
+        $response->assertOk();
+        $this->assertTrue($response->viewData('materials')->pluck('title')->contains('Published Module'));
+    }
+
+    public function test_student_cannot_view_materials_for_subject_outside_their_section(): void
+    {
+        [$user] = $this->actingStudent();
+        [, , , $otherSchedule] = $this->actingStudent();
+
+        LearningMaterial::create([
+            'schedule_id' => $otherSchedule->schedule_id, 'title' => 'Other Section Module', 'status' => 'Published',
+            'file_url' => 'learning_materials/2/other.pdf', 'uploaded_by' => $user->user_id,
+        ]);
+
+        $this->actingAs($user)->get("/student/materials/{$otherSchedule->subject_id}")->assertForbidden();
     }
 
     public function test_student_can_download_published_material_for_own_section(): void

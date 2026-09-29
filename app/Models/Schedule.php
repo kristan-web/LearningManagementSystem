@@ -37,6 +37,11 @@ class Schedule extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id');
+    }
+
     public function assignments()
     {
         return $this->hasMany(Assignment::class, 'schedule_id');

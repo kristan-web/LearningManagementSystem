@@ -150,6 +150,7 @@ This is the identity/auth backbone every other module depends on — build it fi
 - Session-based login (`WebAuthController::login`) — bcrypt validation, auto-rehash on outdated hash, redirects by role.
 - Forced first-login password change: `PasswordChangeController` + `EnsurePasswordIsChanged` middleware (`password.changed` alias), covered by `tests/Feature/ForcedPasswordChangeTest.php` (7 passing tests).
 - Admin-driven account CRUD (`WebAuthController::adminUsers*`): create/edit/list/show, soft delete (`is_deleted`) + restore. Creates the matching `Student` or `Teacher` profile row inline when the role is set.
+- Self-service profile editing for Teacher/Student (`ProfileController::edit`/`update`, routes `GET/PUT /profile` → `profile.edit`/`profile.update`, both behind `auth`+`password.changed`). View (`profile/edit.blade.php`) mirrors the admin settings UI, dynamically extending `layouts.teacher`/`layouts.student`, with a read-only Identity card (name, email, LRN/student number/grade level or teacher number) plus editable Personal Info/Contact Info/Security cards. Identity fields (name, email, role, status, LRN, student_number, grade_level, teacher_number) are never read from the request — `update()` whitelists only `contact_number`, `address`, `birthdate`, `gender`, `password` (all roles) and `specialization` (Teacher only) via the validator, so the lockdown holds even against a raw POST, not just disabled UI fields. Sidebar links (`partials/sidebar/teacher.blade.php`, `partials/sidebar/student.blade.php`) fixed from a dead `url('/profile')` to `route('profile.edit')`.
 - Models: `User`, `Student`, `Teacher`.
 
 **Partial / gaps:**
@@ -161,6 +162,8 @@ This is the identity/auth backbone every other module depends on — build it fi
 - Bulk CSV import for start-of-year enrollment.
 - Account status lifecycle beyond `Active`/`is_deleted` (no suspended/graduated/transferred-out states).
 - Multi-guardian-to-student linking UI (`student_guardians` table exists, unused).
+
+**Testing:** `tests/Feature/ProfileControllerTest.php` (8 passing tests) — student/teacher can view and update their own profile, identity fields (name/email/role/status/LRN/student_number/teacher_number) survive a tampering attempt in the raw request payload, password updates are hashed, Admins get a 403 on `/profile`. Writing this test caught a real bug in `ProfileController::update()`: `$validated['password']` was accessed unguarded, so any update that omitted `password` (e.g. a teacher changing only `specialization`) threw an "Undefined array key" 500 — fixed with a null-coalescing check (`($validated['password'] ?? null) ? ... : $user->password`).
 
 ---
 

@@ -44,7 +44,7 @@
                         @php $submission = $firstSubmission($assignment); @endphp
                         <tr class="align-top">
                             <td class="px-3 py-2.5">
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $assignment->title }}</p>
+                                <a href="{{ route('student.assignments.show', $assignment->assignment_id) }}" class="font-medium text-gray-900 hover:underline dark:text-white">{{ $assignment->title }}</a>
                                 @if ($assignment->instructions)
                                     <p class="mt-0.5 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">{{ $assignment->instructions }}</p>
                                 @endif
