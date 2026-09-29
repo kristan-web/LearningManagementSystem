@@ -14,10 +14,11 @@ class QuizAttempt extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'quiz_id', 'student_id', 'score', 'started_at', 'submitted_at',
+        'quiz_id', 'student_id', 'answers', 'score', 'started_at', 'submitted_at',
     ];
 
     protected $casts = [
+        'answers' => 'array',
         'started_at' => 'datetime',
         'submitted_at' => 'datetime',
     ];

@@ -75,7 +75,7 @@
                 @forelse ($assignments as $assignment)
                     <tr class="align-top hover:bg-slate-50 dark:hover:bg-slate-700/40">
                         <td class="px-4 py-3">
-                            <p class="font-medium text-slate-800 dark:text-slate-100">{{ $assignment->title }}</p>
+                            <a href="{{ route('teacher.assignments.show', $assignment->assignment_id) }}" class="font-medium text-slate-800 hover:underline dark:text-slate-100">{{ $assignment->title }}</a>
                             @if ($assignment->instructions)
                                 <p class="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{{ $assignment->instructions }}</p>
                             @endif

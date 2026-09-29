@@ -14,12 +14,13 @@ class Quiz extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'schedule_id', 'title', 'time_limit_minutes', 'due_date',
+        'schedule_id', 'title', 'time_limit_minutes', 'attempts_allowed', 'due_date',
     ];
 
     protected $casts = [
         'due_date' => 'datetime',
         'created_at' => 'datetime',
+        'attempts_allowed' => 'integer',
     ];
 
     public function schedule()
@@ -30,6 +31,38 @@ class Quiz extends Model
     public function attempts()
     {
         return $this->hasMany(QuizAttempt::class, 'quiz_id');
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(QuizQuestion::class, 'quiz_id');
+    }
+
+    /**
+     * This quiz's questions in a fixed-but-per-attempt-random order, each
+     * question's options likewise shuffled — see QuizQuestion::shuffledOptions().
+     */
+    public function questionsForAttempt(int $attemptId)
+    {
+        return QuizQuestion::seededShuffle($this->questions()->orderBy('question_id')->get()->all(), $attemptId);
+    }
+
+    /**
+     * Quizzes belonging to any of the given teacher's schedules — feeds the
+     * teacher quiz index. Mirrors Assignment::forTeacher().
+     */
+    public function scopeForTeacher(Builder $query, int $teacherId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('teacher_id', $teacherId));
+    }
+
+    /**
+     * Quizzes belonging to schedules in the given section — feeds the student
+     * quiz index. Mirrors Assignment::visibleToSection().
+     */
+    public function scopeVisibleToSection(Builder $query, int $sectionId): Builder
+    {
+        return $query->whereHas('schedule', fn (Builder $q) => $q->where('section_id', $sectionId));
     }
 
     /**

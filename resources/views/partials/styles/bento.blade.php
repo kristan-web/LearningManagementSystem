@@ -73,6 +73,20 @@
         transition: background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
     }
     .bento-card:hover { transform: translateY(-2px); }
+    .bento-card__thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        margin-bottom: 0.75rem;
+        border-radius: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #fff;
+        background: hsl(var(--thumb-hue, 210) 65% 45%);
+        flex-shrink: 0;
+    }
     .bento-card__label { color: var(--card-label); font-size: 0.875rem; font-weight: 500; }
     .bento-card__title { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 600; }
     .bento-card__description { margin: 0; color: var(--card-muted); font-size: 0.75rem; line-height: 1.2; }
