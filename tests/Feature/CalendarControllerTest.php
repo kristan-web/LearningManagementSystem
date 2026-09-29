@@ -98,9 +98,11 @@ class CalendarControllerTest extends TestCase
             'time_limit_minutes' => 30, 'due_date' => now()->addDays(4),
         ]);
 
+        // A wide range (not just the current month) so this doesn't go flaky
+        // near month boundaries when "due in N days" rolls into next month.
         $response = $this->actingAs($user)->getJson('/calendar/events?' . http_build_query([
-            'start' => now()->startOfMonth()->toIso8601String(),
-            'end' => now()->endOfMonth()->toIso8601String(),
+            'start' => now()->subMonth()->toIso8601String(),
+            'end' => now()->addMonths(2)->toIso8601String(),
         ]));
 
         $response->assertOk();

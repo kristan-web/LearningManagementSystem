@@ -18,6 +18,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/lsp-*.php
+/300
 /vendor
 Homestead.json
 Homestead.yaml
