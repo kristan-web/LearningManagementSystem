@@ -26,14 +26,9 @@
                     <h2 class="mt-2 text-lg font-bold text-slate-900 dark:text-white">{{ $announcement->title }}</h2>
                 </div>
                 @if (auth()->user()?->role === 'Admin' || (auth()->user()?->role === 'Teacher' && auth()->id() === (int)$announcement->posted_by))
-                    <div class="flex items-center gap-2">
-                        <button type="button" @click="announcementTitle = @js($announcement->title); announcementBody = @js($announcement->body); announcementSection = @js($announcement->section_id ?? 'school_wide'); editAction = @js(route('announcements.update', $announcement)); editOpen = true;" class="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                            Edit
-                        </button>
-                        <button type="button" @click="announcementTitle = @js($announcement->title); deleteAction = @js(route('announcements.destroy', $announcement)); deleteOpen = true;" class="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400">
-                            Delete
-                        </button>
-                    </div>
+                    <button type="button" @click="announcementTitle = @js($announcement->title); deleteAction = @js(route('announcements.destroy', $announcement)); deleteOpen = true;" class="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400">
+                        Delete
+                    </button>
                 @endif
             </div>
             <p class="mt-4 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">{{ $announcement->body }}</p>
