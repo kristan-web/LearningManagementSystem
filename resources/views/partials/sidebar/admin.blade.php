@@ -13,7 +13,7 @@
    $subActive = 'font-semibold text-ink bg-white/70 before:bg-brand before:ring-4 before:ring-brand/15 dark:bg-white/5 dark:text-white dark:before:bg-blue-400 dark:before:ring-blue-400/20';
 
    $isActive = fn (...$patterns) => request()->is(...$patterns);
-   $academicActive = $isActive('admin/curriculum*', 'admin/school-year*', 'admin/enrollment*');
+   $academicActive = $isActive('admin/curriculum*', 'admin/school-year*', 'admin/enrollment*', 'admin/schedule*');
 @endphp
 
 <style>
@@ -142,6 +142,10 @@
                         <li>
                            <a href="{{ route('admin.enrollment.index') }}" class="{{ $subLink }} {{ $isActive('admin/enrollment*') ? $subActive : $subIdle }}">Enrollment</a>
                         </li>
+                         <li>
+                            <a href="{{ route('admin.schedule.index') }}" class="{{ $subLink }} {{ $isActive('admin/schedule*') ? $subActive : $subIdle }}">Class Schedule</a>
+                         </li>
+
                      </ul>
                   </div>
                </li>
