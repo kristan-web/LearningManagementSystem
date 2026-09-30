@@ -162,6 +162,9 @@ class StudentDashboardTest extends TestCase
         $response->assertViewHas('latestAnnouncement', function ($announcement) use ($latest) {
             return $announcement->announcement_id === $latest->announcement_id;
         });
+
+        // Dashboard widget links to the announcement's anchor on the full feed page.
+        $response->assertSee('href="' . route('announcements.index') . '#announcement-' . $latest->announcement_id . '"', false);
     }
 
     public function test_non_student_role_is_forbidden_from_student_dashboard(): void

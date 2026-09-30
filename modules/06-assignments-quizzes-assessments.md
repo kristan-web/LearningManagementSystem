@@ -156,12 +156,13 @@ SUBMISSION and QUIZ_ATTEMPT both feed into GRADE_COMPONENT (module 7) — keep t
 - `Assignment::forSectionCalendar()` / `Quiz::forSectionCalendar()` scopes (section-scoped, due-date-not-null) — built as a Module 9 (Calendar) dependency so assignment/quiz due dates surface on the student calendar, covered by `tests/Feature/CalendarControllerTest.php`.
 - `quizzes.due_date` column (migration `2026_09_24_000001_add_due_date_to_quizzes_table`) added so quizzes can appear on the calendar the same way assignments do.
 - `AssignmentSeeder` / `QuizSeeder` (wired into `DatabaseSeeder`) generate placeholder assignment/quiz rows against a demo section/schedule so the calendar has data to render out of the box.
+- **Assignments loop (built Sept 29, 2026 — not previously documented here):** `TeacherAssignmentController` — index/create/store/show/destroy plus `submissions()` (roster + submission list) and `grade()` (score entry), all owner-scoped to the teacher's own schedules. `StudentAssignmentController` — index (section-scoped list with the student's own submission preloaded), `show`, and `submit()` (file upload, one submission per student, auto-flags `Late` vs `Submitted` by comparing to `due_date`). Full teacher-create → student-submit → teacher-grade → student-sees-score loop. Covered by `tests/Feature/AssignmentLoopTest.php`.
+- **Quiz teacher/student flows are now fully built too:** `TeacherQuizController` — index/create/store (bulk question import via CSV, handled by a dedicated `QuizCsvImporter`), destroy, all scoped to quizzes the teacher owns. `StudentQuizController` — index (grouped by subject), take/resume (enforces a configurable attempts-allowed limit), submit (auto-scores objective items), and a results view. Both covered by `tests/Feature/TeacherQuizTest.php` and `tests/Feature/StudentQuizTest.php`.
+- **New capability — Assignment discussion/comments:** `AssignmentComment` model (one level of threaded replies, Facebook-style — no infinite nesting) plus `AssignmentCommentController` (store/destroy). Any user who can access the assignment (`Assignment::isAccessibleBy()`) can post; a comment can be deleted by its author or by the teacher who owns the assignment. Rendered via `partials/assignment-comment.blade.php` / `partials/assignment-discussion.blade.php`. Covered by `tests/Feature/AssignmentDiscussionTest.php`.
 
 **Not started:**
-- No `AssignmentController`/`QuizController` — no teacher-facing UI to create assignments/quizzes, set due dates, or attach rubrics.
-- No student-facing "take a quiz" or "submit an assignment" flow — only the pending-count aggregation and calendar due-date display exist.
-- `teacher/assignments/index.blade.php` is an unwired stub; `student/assignments/index.blade.php` renders a real list (via `StudentDashboardController`) but has no submission form yet.
-- No rubric model/UI.
+- No rubric model/UI — assignments have a flat `max_score`, no weighted rubric criteria.
+- No plagiarism detection.
 
 ---
 

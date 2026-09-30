@@ -13,7 +13,7 @@
 
 <div class="space-y-4">
     @forelse ($announcements as $announcement)
-        <article class="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+        <article id="announcement-{{ $announcement->announcement_id }}" class="scroll-mt-20 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm target:ring-2 target:ring-blue-400 dark:border-slate-700 dark:bg-slate-800">
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-2 text-xs">
@@ -31,10 +31,25 @@
                     </button>
                 @endif
             </div>
+            @if ($announcement->thumbnail_path)
+                <img src="{{ route('announcements.thumbnail', $announcement) }}" alt="" class="mt-4 max-h-96 w-full rounded-xl object-cover">
+            @endif
             <p class="mt-4 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">{{ $announcement->body }}</p>
+            @if ($announcement->attachments->isNotEmpty())
+                <div class="mt-4 space-y-2">
+                    @foreach ($announcement->attachments as $attachment)
+                        <a href="{{ route('announcements.attachments.download', $attachment) }}" class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 dark:border-slate-700 dark:text-blue-300 dark:hover:bg-slate-700/50">
+                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2-9a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span class="truncate">{{ $attachment->file_name }}</span>
+                            <span class="ml-auto shrink-0 text-xs font-normal text-slate-400">{{ number_format($attachment->file_size / 1024, 1) }} KB</span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
             <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400 dark:border-slate-800">
                 Posted by {{ $announcement->postedBy?->first_name }} {{ $announcement->postedBy?->last_name }} ({{ $announcement->postedBy?->role ?? 'Staff' }})
             </div>
+            @include('partials.announcement-discussion', ['announcement' => $announcement])
         </article>
     @empty
         <div class="rounded-2xl border border-dashed border-slate-200 p-12 text-center dark:border-slate-700">

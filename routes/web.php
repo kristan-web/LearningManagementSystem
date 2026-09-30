@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminScheduleController;
+use App\Http\Controllers\AnnouncementCommentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AssignmentCommentController;
 use App\Http\Controllers\CalendarController;
@@ -118,5 +119,9 @@ Route::middleware('auth')->group(function () {
 		Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 		Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
 		Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+		Route::get('/announcements/{announcement}/thumbnail', [AnnouncementController::class, 'thumbnail'])->name('announcements.thumbnail');
+		Route::get('/announcements/attachments/{attachment}/download', [AnnouncementController::class, 'attachmentDownload'])->name('announcements.attachments.download');
+		Route::post('/announcements/{announcement}/comments', [AnnouncementCommentController::class, 'store'])->name('announcements.comments.store');
+		Route::delete('/announcements/{announcement}/comments/{comment}', [AnnouncementCommentController::class, 'destroy'])->name('announcements.comments.destroy');
 	});
 });

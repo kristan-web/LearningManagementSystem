@@ -148,10 +148,10 @@ CURRICULUM_SUBJECT is the single source of truth that drives scheduling (3.x) an
 **Done:**
 - `EnrollmentController`: full CRUD for `/admin/enrollment` — search by student name/number/LRN, filter by school year/section/semester/status, stats cards, section slot-limit validation on enroll.
 - `SubjectController`: full CRUD for `/admin/curriculum` — subjects filterable by strand/teacher/type/grade/semester.
-- Models: `Strand`, `Subject`, `ClassSection`, `Enrollment`, `SchoolYear`.
+- Models: `Strand`, `Subject`, `ClassSection`, `Enrollment`, `SchoolYear`, `Track`.
+- **Fixed (Oct 2026):** `Track.php` now exists in `app/Models/` (`track_id`, `track_code`, `track_name`, `strands()` relation) — `Strand::track()` resolves correctly instead of throwing a class-not-found error. Regression-covered by `tests/Feature/TrackGuardianModelTest.php::test_strand_belongs_to_track_and_track_has_many_strands`.
 
-**Partial / gaps (bugs, not just missing scope):**
-- `Strand::track()` references `App\Models\Track`, but no `Track.php` model file exists in `app/Models/` — calling that relation throws a class-not-found error. The `tracks` table itself exists and is used, just only via raw `DB::table('tracks')` (see tests), never through Eloquent.
+**Partial / gaps:**
 - The master ERD's `CURRICULUM_SUBJECT` join table (strand × subject × semester) was never implemented — the real schema puts `strand_id`, `grade_level`, and `semester` directly on `subjects` instead. Flatter than planned; works at current scale but a subject can't cleanly belong to more than one strand/semester without duplicate rows.
 - Student-facing enrollment view (`student/enrollment/index.blade.php`) is an unwired stub.
 

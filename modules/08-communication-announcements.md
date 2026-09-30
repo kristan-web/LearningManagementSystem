@@ -117,9 +117,10 @@ Every announcement/message should raise a NOTIFICATION event (module 14) rather 
 
 **Done:**
 - `Announcement` model with `visibleToSection()` scope (school-wide when `section_id IS NULL`, or scoped to a given section) — built as a Module 16 dependency and covered by `tests/Feature/StudentDashboardTest.php`. `shared/announcements/index.blade.php` renders a real, working list via `StudentDashboardController`.
+- **`AnnouncementController`** now exists — full index/store/destroy CRUD at `/announcements`, with role-scoped visibility (students see their section's + school-wide announcements; teachers see their own posts, the sections they teach, and school-wide; admins see everything) and enforcement that a teacher can only post to a section they actually teach. Supports a thumbnail plus multiple file attachments via the new `AnnouncementAttachment` model, streamed back through private-disk download/thumbnail routes. Covered by `tests/Feature/AnnouncementTest.php`.
+- **New capability — Announcement discussion/comments:** `AnnouncementComment` model (one level of threaded replies, same pattern as Module 6's assignment comments) plus `AnnouncementCommentController` (store/destroy). A comment can be deleted by its author, the announcement's poster, or an admin. Rendered via `partials/announcement-comment.blade.php` / `partials/announcement-discussion.blade.php`. Covered by `tests/Feature/AnnouncementDiscussionTest.php`.
 
 **Not started:**
-- No `AnnouncementController` for creating/editing/deleting announcements — no admin or teacher posting UI.
 - No `Message` model and no direct-messaging feature — `shared/messages/index.blade.php`, `teacher/communication/index.blade.php`, and `student/communication/index.blade.php` are all unwired placeholder views.
 - No broadcast/notification hookup when an announcement is posted (see Module 14 — not yet event-driven).
 

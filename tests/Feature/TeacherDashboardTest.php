@@ -199,6 +199,13 @@ class TeacherDashboardTest extends TestCase
         $response->assertViewHas('latestAnnouncement', function ($announcement) use ($latest) {
             return $announcement->announcement_id === $latest->announcement_id;
         });
+
+        $feed = $response->viewData('announcements');
+        $this->assertCount(2, $feed);
+        $this->assertSame($latest->announcement_id, $feed->first()->announcement_id);
+
+        // Dashboard widget links to the announcement's anchor on the full feed page.
+        $response->assertSee('href="' . route('announcements.index') . '#announcement-' . $latest->announcement_id . '"', false);
     }
 
     public function test_non_teacher_role_is_forbidden_from_teacher_dashboard(): void

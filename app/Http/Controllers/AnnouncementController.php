@@ -3,22 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\AnnouncementAttachment;
 use App\Models\ClassSection;
 use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AnnouncementController extends Controller
 {
+    /** Same private disk convention as materials/submissions — never a guessable public URL. */
+    private const DISK = 'local';
+
     public function index(Request $request): View
     {
         $user = $request->user();
         $role = $user->role;
 
-        $query = Announcement::with(['postedBy', 'section']);
+        $query = Announcement::with(['postedBy', 'section', 'attachments', 'comments']);
 
         $teacher = null;
         $student = null;
@@ -79,6 +85,9 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'body' => 'required|string',
             'section_id' => 'nullable|string', // can be 'school_wide' or integer
+            'thumbnail' => 'nullable|image|max:5120|mimes:jpg,jpeg,png,gif,webp',
+            'attachments' => 'nullable|array|max:5',
+            'attachments.*' => 'file|max:20480|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,png,jpg,jpeg',
         ]);
 
         $sectionId = null;
@@ -99,13 +108,29 @@ class AnnouncementController extends Controller
             }
         }
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'posted_by' => $user->user_id,
             'section_id' => $sectionId,
             'title' => $validated['title'],
             'body' => $validated['body'],
             'posted_at' => now(),
         ]);
+
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('announcements/' . $announcement->announcement_id, self::DISK);
+            $announcement->update(['thumbnail_path' => $path]);
+        }
+
+        foreach ($request->file('attachments', []) as $file) {
+            $path = $file->store('announcements/' . $announcement->announcement_id . '/attachments', self::DISK);
+
+            AnnouncementAttachment::create([
+                'announcement_id' => $announcement->announcement_id,
+                'file_name' => $file->getClientOriginalName(),
+                'file_url' => $path,
+                'file_size' => $file->getSize(),
+            ]);
+        }
 
         return redirect()->route('announcements.index')->with('success', 'Announcement published successfully.');
     }
@@ -120,8 +145,32 @@ class AnnouncementController extends Controller
             abort_unless((int) $announcement->posted_by === (int) $user->user_id, 403);
         }
 
+        if ($announcement->thumbnail_path) {
+            Storage::disk(self::DISK)->delete($announcement->thumbnail_path);
+        }
+
+        foreach ($announcement->attachments as $attachment) {
+            Storage::disk(self::DISK)->delete($attachment->file_url);
+        }
+
         $announcement->delete();
 
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
+    }
+
+    /** Streams the thumbnail image inline — gated by the same visibility rule as the feed. */
+    public function thumbnail(Request $request, Announcement $announcement): StreamedResponse
+    {
+        abort_unless($announcement->thumbnail_path && $announcement->isViewableBy($request->user()), 404);
+
+        return Storage::disk(self::DISK)->response($announcement->thumbnail_path);
+    }
+
+    /** Downloads an attachment — gated by the parent announcement's visibility rule. */
+    public function attachmentDownload(Request $request, AnnouncementAttachment $attachment): StreamedResponse
+    {
+        abort_unless($attachment->announcement?->isViewableBy($request->user()), 403);
+
+        return Storage::disk(self::DISK)->download($attachment->file_url, $attachment->file_name);
     }
 }

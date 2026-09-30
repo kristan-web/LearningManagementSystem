@@ -6,8 +6,11 @@
         <x-cards.list title="Upcoming" href="{{ route('calendar.index') }}" hrefLabel="View calendar">
             <li>...</li>
         </x-cards.list>
+
+    Pass scrollable to cap the list's height and let it scroll independently of the
+    page (header/link stay put) — used by the student dashboard's announcements feed.
 --}}
-@props(['title', 'href' => null, 'hrefLabel' => 'View all', 'empty' => 'Nothing to show.'])
+@props(['title', 'href' => null, 'hrefLabel' => 'View all', 'empty' => 'Nothing to show.', 'scrollable' => false])
 
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
     <div class="flex items-center justify-between mb-3">
@@ -18,7 +21,7 @@
     </div>
 
     @if(trim($slot) !== '')
-        <ul class="space-y-2">
+        <ul @class(['space-y-2', 'max-h-[32rem] overflow-y-auto pr-1 -mr-1' => $scrollable])>
             {{ $slot }}
         </ul>
     @else

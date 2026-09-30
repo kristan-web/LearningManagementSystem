@@ -12,9 +12,12 @@ use App\Models\Subject;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Models\AnnouncementAttachment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AnnouncementTest extends TestCase
@@ -164,6 +167,84 @@ class AnnouncementTest extends TestCase
             'section_id' => $this->sectionA->section_id,
             'posted_by' => $this->teacherUser->user_id,
         ]);
+    }
+
+    /**
+     * Real 1x1 PNG bytes — the 'image' validation rule sniffs actual file
+     * content (not the filename), and the GD extension isn't available in
+     * this environment for UploadedFile::fake()->image().
+     */
+    private function fakePng(string $name = 'cover.png'): UploadedFile
+    {
+        $bytes = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
+
+        return UploadedFile::fake()->createWithContent($name, $bytes);
+    }
+
+    public function test_teacher_can_post_announcement_with_thumbnail_and_attachments(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->actingAs($this->teacherUser)->post(route('announcements.store'), [
+            'title' => 'Field Trip Photos',
+            'body' => 'See attached forms.',
+            'section_id' => (string) $this->sectionA->section_id,
+            'thumbnail' => $this->fakePng(),
+            'attachments' => [
+                UploadedFile::fake()->create('consent.pdf', 100),
+                UploadedFile::fake()->create('itinerary.docx', 50),
+            ],
+        ]);
+
+        $response->assertRedirect(route('announcements.index'));
+
+        $announcement = Announcement::where('title', 'Field Trip Photos')->firstOrFail();
+        $this->assertNotNull($announcement->thumbnail_path);
+        Storage::disk('local')->assertExists($announcement->thumbnail_path);
+
+        $this->assertSame(2, AnnouncementAttachment::where('announcement_id', $announcement->announcement_id)->count());
+        foreach ($announcement->attachments as $attachment) {
+            Storage::disk('local')->assertExists($attachment->file_url);
+        }
+    }
+
+    public function test_announcement_thumbnail_rejects_invalid_file_type(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->actingAs($this->teacherUser)->post(route('announcements.store'), [
+            'title' => 'Bad Thumbnail',
+            'body' => 'Should be rejected.',
+            'section_id' => (string) $this->sectionA->section_id,
+            'thumbnail' => UploadedFile::fake()->create('not-an-image.pdf', 100),
+        ]);
+
+        $response->assertSessionHasErrors('thumbnail');
+        $this->assertDatabaseMissing('announcements', ['title' => 'Bad Thumbnail']);
+    }
+
+    public function test_deleting_announcement_removes_thumbnail_and_attachment_files(): void
+    {
+        Storage::fake('local');
+
+        $this->actingAs($this->teacherUser)->post(route('announcements.store'), [
+            'title' => 'Cleanup Test',
+            'body' => 'Delete me.',
+            'section_id' => (string) $this->sectionA->section_id,
+            'thumbnail' => $this->fakePng(),
+            'attachments' => [UploadedFile::fake()->create('file.pdf', 50)],
+        ]);
+
+        $announcement = Announcement::where('title', 'Cleanup Test')->firstOrFail();
+        $thumbnailPath = $announcement->thumbnail_path;
+        $attachmentPath = $announcement->attachments->first()->file_url;
+
+        $this->actingAs($this->teacherUser)->delete(route('announcements.destroy', $announcement))
+            ->assertRedirect(route('announcements.index'));
+
+        Storage::disk('local')->assertMissing($thumbnailPath);
+        Storage::disk('local')->assertMissing($attachmentPath);
+        $this->assertDatabaseMissing('announcement_attachments', ['announcement_id' => $announcement->announcement_id]);
     }
 
     public function test_teacher_cannot_post_announcement_to_section_they_do_not_teach(): void

@@ -817,9 +817,14 @@ Notable findings from this pass:
   side effect — those tables existed in migrations but had zero models before.
 - **Update:** Module 9 (Calendar & Events) has since grown its own controller → service → view →
   test chain (`CalendarController`, `CalendarEventService`, `StoreCalendarEventRequest`, a full
-  FullCalendar UI, 9 passing tests), and repaid the favor by adding `forSectionCalendar()` scopes
+  FullCalendar UI, passing tests), and repaid the favor by adding `forSectionCalendar()` scopes
   to `Assignment`/`Quiz` (Module 6) plus a `quizzes.due_date` column, so assignment/quiz deadlines
-  now render on the calendar. Still student-only — no admin/teacher event CRUD exists yet.
+  now render on the calendar. **Update (Oct 2026):** no longer student-only — `CalendarController`
+  now branches by role, with `feedForAdmin()` (every school-wide event) and `feedForTeacher()`
+  (personal events + assignment/quiz due dates across every section the teacher teaches, via new
+  `forTeacherCalendar()` scopes) added alongside the original `feedFor()` for students. Real
+  `admin/calendar` and `teacher/calendar` views exist. Dedicated test coverage for the teacher path
+  is still thin.
 - **Update:** Module 5 (Content & Learning Materials) also now has a full backend: `LearningMaterial`
   model with `forTeacher()`/`visibleToSection()` scopes, `TeacherMaterialController` (upload/edit/
   delete, owner-scoped), `StudentMaterialController` (Published-only, section-scoped, grouped by
@@ -829,9 +834,26 @@ Notable findings from this pass:
   `tests/Feature/TeacherMaterialTest.php` + `tests/Feature/StudentMaterialTest.php` pass. Real gaps
   against this module's original spec: no file versioning (edits overwrite in place), no
   offline-friendly-format handling, and no access-analytics logging.
-- Two live bugs found during review, not yet fixed: `Strand::track()` (Module 2) references a
-  `Track` model that doesn't exist in `app/Models/`; the `Guardian` model (Module 12) is entirely
-  missing despite `students.guardian_id` being a real FK.
+- **Update (Oct 2026):** both live bugs noted in the original pass are now fixed — `Track.php`
+  (Module 2) exists so `Strand::track()` resolves, and `Guardian.php` (Module 12) exists with
+  `user()`/`students()` relations. Neither fix adds UI: Module 12 still has no portal routes,
+  controller, or views at all.
+- **Update (Oct 2026):** Module 3 (Class & Scheduling) grew a real `AdminScheduleController`
+  (CRUD + section/teacher/room conflict detection), a real `Room` model, and teacher/student
+  timetable views — no longer just the bare `Schedule` model. 3 `AdminScheduleTest` cases still
+  fail (conflict-message precedence when two conflict types overlap; a 404-before-403 ordering
+  issue on a bad schedule ID) — documented as known gaps in `modules/03-class-scheduling.md`,
+  not yet fixed.
+- **Update (Oct 2026):** Module 6 (Assignments, Quizzes & Assessments) — quizzes now have a full
+  teacher/student UI (`TeacherQuizController` with CSV question import, `StudentQuizController`
+  with take/resume/auto-score), matching what the assignments loop already had. Both Module 6
+  (assignments) and Module 8 (announcements) gained a new, previously-undocumented threaded
+  discussion/comments capability (`AssignmentComment`, `AnnouncementComment` — one level of
+  replies, author/owner moderation), each with its own feature test.
+- **Update (Oct 2026):** Module 8 (Communication & Announcements) gained a real posting UI —
+  `AnnouncementController` (role-scoped CRUD, thumbnail + multi-file attachments) — closing the
+  "no posting UI" gap from the original pass. Direct messaging (`Message` model) remains
+  unbuilt.
 - Self-service registration/password-reset (originally under Module 1) was removed from the
   codebase — account provisioning is now Admin-only.
 - `routes/api.php` is empty; despite Section 0 describing a REST/JSON API, no module currently

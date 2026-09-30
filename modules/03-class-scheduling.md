@@ -124,12 +124,17 @@ CLASS_SCHEDULE is the pivot table nearly every operational module (Attendance, M
 
 **Done:**
 - `Schedule` model (`schedules` table) with `section()`, `subject()`, `teacher()`, `assignments()`, `quizzes()` relations — built as supporting infrastructure for Module 16 (Student Dashboard), directly reusable for this module's own purpose.
+- `Room` model (`room_id`, `room_name`, `building`, `capacity`, `schedules()` relation) — no longer raw-table-only.
+- `AdminScheduleController`: full CRUD for `/admin/schedule` (index/store/update/destroy) — assigns section + subject + teacher + optional room to a day/time slot. Overlap-based **conflict detection** rejects a save if the section, the teacher, or the room is already booked for an overlapping time on the same day. Deleting a schedule period is blocked while it has linked assignments/quizzes. Wired to a real `admin/schedule/index.blade.php` view with a Room dropdown (rooms are managed inline through this form — there is still no standalone Room CRUD screen).
+- `TeacherScheduleController` (`/teacher/schedule`) and `StudentScheduleController` (`/student/schedule`): real, day-of-week-ordered weekly timetable views, scoped to the logged-in teacher's own periods / the student's active-enrollment section respectively. Wired to real views (no longer stubs).
+- Tests: `tests/Feature/AdminScheduleTest.php`, `tests/Feature/TeacherScheduleTest.php`, `tests/Feature/StudentScheduleTest.php`.
+
+**Known test gaps (not yet fixed):**
+- 3 of `AdminScheduleTest`'s cases currently fail:
+  - Two conflict-message-precedence cases expect a "Room is already booked" message, but `detectConflict()` checks section-conflict before room-conflict, so when a test setup produces both, the section message wins instead — the save is still correctly blocked, just with a different message than the test asserts.
+  - One authorization-ordering case: `PUT /admin/schedule/{id}` for a non-existent schedule ID hits Laravel route-model-binding (404) before the controller's own `abort_unless(...,403)` role check runs, so a non-admin with a bad ID gets 404 instead of the expected 403.
 
 **Not started:**
-- No `ScheduleController`, no admin/teacher UI to build timetables.
-- No conflict detection (teacher/room double-booking).
-- No `Room` model (table exists, used only via raw `DB::table('rooms')` in tests).
-- Teacher (`teacher/schedule/index.blade.php`) and student (`student/schedule/index.blade.php`) schedule views are unwired stubs.
 - No immersion/OJT block-schedule support.
 
 ---

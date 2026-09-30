@@ -14,9 +14,13 @@ class StudentDashboardService
     private const UPCOMING_EVENTS_LIMIT = 5;
     private const UPCOMING_EVENTS_WITHIN_DAYS = 14;
 
+    /** Announcement feed cap for the dashboard's scrollable newsfeed widget. */
+    private const ANNOUNCEMENTS_FEED_LIMIT = 10;
+
     /**
      * Build the summary data for the student dashboard: pending assignment/quiz
-     * counts, the next few upcoming calendar events, and the latest announcement.
+     * counts, the next few upcoming calendar events, and a feed of recent
+     * announcements (plus the latest one, kept for backwards compatibility).
      *
      * All scoping (section, visibility) is delegated to Eloquent scopes on the
      * respective models so the same logic is reusable by the real Assignments,
@@ -25,6 +29,14 @@ class StudentDashboardService
     public function summaryFor(Student $student): array
     {
         $sectionId = $student->activeEnrollment?->section_id;
+
+        $announcements = ($sectionId
+            ? Announcement::visibleToSection($sectionId)
+            : Announcement::whereNull('section_id'))
+            ->with('postedBy')
+            ->latest('posted_at')
+            ->limit(self::ANNOUNCEMENTS_FEED_LIMIT)
+            ->get();
 
         return [
             'pendingAssignmentsCount' => $sectionId
@@ -38,9 +50,8 @@ class StudentDashboardService
                 ->orderBy('start_datetime')
                 ->limit(self::UPCOMING_EVENTS_LIMIT)
                 ->get(),
-            'latestAnnouncement' => $sectionId
-                ? Announcement::visibleToSection($sectionId)->latest('posted_at')->first()
-                : Announcement::whereNull('section_id')->latest('posted_at')->first(),
+            'announcements' => $announcements,
+            'latestAnnouncement' => $announcements->first(),
         ];
     }
 }

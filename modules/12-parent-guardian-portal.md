@@ -99,13 +99,13 @@ This module is mostly a read-only composite view over Grading (7), Attendance (4
 
 *(verified against the codebase, Sept 2026 — see `modules/README.md` for the project-wide table)*
 
-**Partial / gaps:**
-- The `guardians` table exists (migration `2026_09_20_000004_create_guardians_table.php`, `user_id`/`full_name`/`relationship`/`contact_number`), and `students.guardian_id` is a nullable FK into it — but there is **no `Guardian` Eloquent model** in `app/Models/`.
+**Done:**
+- **Fixed (Oct 2026):** `Guardian.php` now exists in `app/Models/` (`guardian_id`, `user_id`, `full_name`, `relationship`, `contact_number`, `user()` belongsTo, `students()` hasMany via `students.guardian_id`) — closes the "no Eloquent model" gap previously noted here. See `docs/spec/batch-a-model-fixes.md` (decision M12-03) and `tests/Feature/TrackGuardianModelTest.php`.
 
 **Not started:**
 - No guardian portal routes, controller, or views of any kind.
 - No multi-ward (one guardian, multiple children) switching UI.
-- The `student_guardians` many-to-many table referenced in Module 1 is unused.
+- The `student_guardians` many-to-many table referenced in Module 1 remains unused by design — `Guardian::students()` uses the single `students.guardian_id` FK instead (documented as a deferred decision in `docs/spec/batch-a-model-fixes.md`).
 
 ---
 

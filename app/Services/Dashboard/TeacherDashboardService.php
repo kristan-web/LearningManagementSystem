@@ -14,10 +14,14 @@ class TeacherDashboardService
     /** Upcoming events cap — mirrors the student dashboard widget (see modules/16-student-dashboard.md). */
     private const UPCOMING_EVENTS_LIMIT = 5;
 
+    /** Announcement feed cap for the dashboard's scrollable newsfeed widget — mirrors the student dashboard. */
+    private const ANNOUNCEMENTS_FEED_LIMIT = 10;
+
     /**
      * Build the summary data for the teacher dashboard: class/period counts,
-     * pending grading counts, today's schedule, upcoming events, and the
-     * latest announcement.
+     * pending grading counts, today's schedule, upcoming events, and a feed
+     * of recent announcements (plus the latest one, kept for backwards
+     * compatibility).
      */
     public function summaryFor(Teacher $teacher): array
     {
@@ -26,6 +30,12 @@ class TeacherDashboardService
 
         $todaysSchedule = Schedule::forTeacherToday($teacherId, $today)
             ->with(['section', 'subject'])
+            ->get();
+
+        $announcements = Announcement::visibleToTeacher($teacherId)
+            ->with('postedBy')
+            ->latest('posted_at')
+            ->limit(self::ANNOUNCEMENTS_FEED_LIMIT)
             ->get();
 
         return [
@@ -38,7 +48,8 @@ class TeacherDashboardService
                 ->orderBy('start_datetime')
                 ->limit(self::UPCOMING_EVENTS_LIMIT)
                 ->get(),
-            'latestAnnouncement' => Announcement::visibleToTeacher($teacherId)->latest('posted_at')->first(),
+            'announcements' => $announcements,
+            'latestAnnouncement' => $announcements->first(),
         ];
     }
 }
