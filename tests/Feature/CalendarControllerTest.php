@@ -220,14 +220,33 @@ class CalendarControllerTest extends TestCase
 
     public function test_non_student_role_is_forbidden_from_calendar(): void
     {
+        $guest = User::create([
+            'first_name' => 'Guest', 'last_name' => 'User', 'email' => 'guest@example.com',
+            'password' => Hash::make('password'), 'must_change_password' => false,
+            'role' => 'Registrar', 'status' => 'Active',
+        ]);
+
+        $response = $this->actingAs($guest)->get('/calendar');
+
+        $response->assertForbidden();
+    }
+
+    public function test_admin_can_create_event(): void
+    {
         $admin = User::create([
             'first_name' => 'Admin', 'last_name' => 'User', 'email' => 'admin@example.com',
             'password' => Hash::make('password'), 'must_change_password' => false,
             'role' => 'Admin', 'status' => 'Active',
         ]);
 
-        $response = $this->actingAs($admin)->get('/calendar');
+        $response = $this->actingAs($admin)->postJson('/calendar/events', [
+            'title' => 'School Event',
+            'start_datetime' => now()->addDay()->format('Y-m-d H:i:s'),
+            'end_datetime' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+        ]);
 
-        $response->assertForbidden();
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('schedule_events', ['title' => 'School Event', 'created_by_role' => 'Admin']);
     }
+
 }

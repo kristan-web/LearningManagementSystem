@@ -286,7 +286,7 @@ class WebAuthController extends Controller
             'student_number' => 'nullable|string|max:20',
             'grade_level' => 'nullable|in:11,12',
             'strand_id' => 'nullable|integer',
-            'student_guardian_id' => 'nullable|integer',
+            'student_guardian_id' => 'nullable|integer|exists:guardians,guardian_id',
             // Teacher fields
             'teacher_number' => 'nullable|string|max:20',
             'specialization' => 'nullable|string|max:255',
@@ -376,7 +376,7 @@ class WebAuthController extends Controller
             'student_lrn' => 'nullable|string|max:12',
             'student_number' => 'nullable|string|max:20',
             'grade_level' => 'nullable|in:11,12',
-            'student_guardian_id' => 'nullable|integer',
+            'student_guardian_id' => 'nullable|integer|exists:guardians,guardian_id',
             // Teacher fields
             'teacher_number' => 'nullable|string|max:20',
             'specialization' => 'nullable|string|max:255',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCalendarEventRequest;
+use App\Models\Schedule;
 use App\Models\ScheduleEvent;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -15,7 +16,7 @@ use Illuminate\View\View;
 class CalendarController extends Controller
 {
     /** Roles allowed to view the calendar and manage their own personal events. */
-    private const ALLOWED_ROLES = ['Student', 'Teacher'];
+    private const ALLOWED_ROLES = ['Student', 'Teacher', 'Admin'];
 
     public function __construct(private readonly CalendarEventService $calendar)
     {
@@ -25,7 +26,14 @@ class CalendarController extends Controller
     {
         abort_unless(in_array($request->user()->role, self::ALLOWED_ROLES, true), 403);
 
-        return view('shared.calendar.index');
+        $view = match ($request->user()->role) {
+            'Admin' => 'admin.calendar.index',
+            'Teacher' => 'teacher.calendar.index',
+            'Student' => 'student.calendar.index',
+            default => 'shared.calendar.index',
+        };
+
+        return view($view);
     }
 
     /**
@@ -39,6 +47,10 @@ class CalendarController extends Controller
         $from = Carbon::parse($request->query('start', now()->startOfMonth()));
         $to = Carbon::parse($request->query('end', now()->endOfMonth()));
 
+        if ($request->user()->role === 'Admin') {
+            return response()->json($this->calendar->feedForAdmin($from, $to));
+        }
+
         if ($request->user()->role === 'Teacher') {
             $teacher = Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
 
@@ -47,11 +59,36 @@ class CalendarController extends Controller
 
         $student = Student::where('user_id', $request->user()->user_id)->firstOrFail();
 
+        if ($request->user()->role === 'Admin') {
+            $event = ScheduleEvent::create([
+                ...$request->validated(),
+                'created_by_role' => 'Admin',
+                'created_by_id' => $request->user()->user_id,
+                'event_type' => 'School',
+                'status' => 'Scheduled',
+            ]);
+
+            return response()->json($event, 201);
+        }
+
+
         return response()->json($this->calendar->feedFor($student, $from, $to));
     }
 
     public function store(StoreCalendarEventRequest $request): JsonResponse
     {
+        if ($request->user()->role === 'Admin') {
+            $event = ScheduleEvent::create([
+                ...$request->validated(),
+                'created_by_role' => 'Admin',
+                'created_by_id' => $request->user()->user_id,
+                'event_type' => 'School',
+                'status' => 'Scheduled',
+            ]);
+
+            return response()->json($event, 201);
+        }
+
         if ($request->user()->role === 'Teacher') {
             $teacher = Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
 
@@ -102,6 +139,10 @@ class CalendarController extends Controller
     private function authorizePersonalEvent(Request $request, ScheduleEvent $event): void
     {
         $role = $request->user()->role;
+
+        if ($role === 'Admin') {
+            return;
+        }
 
         if ($role === 'Teacher') {
             $teacher = Teacher::where('user_id', $request->user()->user_id)->firstOrFail();

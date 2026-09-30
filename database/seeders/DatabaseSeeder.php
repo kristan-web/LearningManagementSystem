@@ -18,12 +18,17 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'email' => 'admin123@example.com',
-            'password' => bcrypt('Password123'),
+            'first_name' => 'Lance',
+            'last_name' => 'Villanueva',
+            'email' => 'lance@admin.com',
+            'password' => bcrypt('Admin123'),
             'role' => 'Admin',
+            'must_change_password' => false,
         ]);
 
         $this->call([
+            GuardianSeeder::class,
+            StudentSeeder::class,
             AssignmentSeeder::class,
             QuizSeeder::class,
             LearningMaterialSeeder::class,

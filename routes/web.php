@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminScheduleController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AssignmentCommentController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EnrollmentController;
@@ -50,6 +52,10 @@ Route::middleware('auth')->group(function () {
 	Route::put('/admin/enrollment/{enrollment}', [EnrollmentController::class, 'update'])->name('admin.enrollment.update');
 	Route::delete('/admin/enrollment/{enrollment}', [EnrollmentController::class, 'destroy'])->name('admin.enrollment.destroy');
 	Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+	Route::get('/admin/schedule', [AdminScheduleController::class, 'index'])->name('admin.schedule.index');
+	Route::post('/admin/schedule', [AdminScheduleController::class, 'store'])->name('admin.schedule.store');
+	Route::put('/admin/schedule/{schedule}', [AdminScheduleController::class, 'update'])->name('admin.schedule.update');
+	Route::delete('/admin/schedule/{schedule}', [AdminScheduleController::class, 'destroy'])->name('admin.schedule.destroy');
 	Route::post('/admin/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('admin.notifications.read-all');
 	Route::post('/admin/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('admin.notifications.read');
 	Route::view('/admin/settings', 'admin.settings.index')->name('admin.settings');
@@ -109,6 +115,8 @@ Route::middleware('auth')->group(function () {
 		Route::post('/calendar/events', [CalendarController::class, 'store'])->name('calendar.events.store');
 		Route::put('/calendar/events/{event}', [CalendarController::class, 'update'])->name('calendar.events.update');
 		Route::delete('/calendar/events/{event}', [CalendarController::class, 'destroy'])->name('calendar.events.destroy');
-		Route::view('/announcements', 'shared.announcements.index')->name('announcements.index');
+		Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+		Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+		Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 	});
 });
