@@ -9,7 +9,7 @@
 @extends($layout)
 @section('title', 'Announcements')
 @section('content')
-<div class="mx-auto w-full max-w-5xl space-y-6 pt-6" x-data="{ createOpen: false, deleteOpen: false, deleteAction: '', announcementTitle: '' }">
+<div class="mx-auto w-full max-w-5xl space-y-6 pt-6" x-data="{ createOpen: false, editOpen: false, deleteOpen: false, deleteAction: '', editAction: '', announcementTitle: '', announcementBody: '', announcementSection: '' }">
     @if (session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300">
             {{ session('success') }}

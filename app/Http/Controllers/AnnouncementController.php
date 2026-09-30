@@ -124,4 +124,48 @@ class AnnouncementController extends Controller
 
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
+
+    public function update(Request $request, Announcement $announcement): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless(in_array($user->role, ['Admin', 'Teacher'], true), 403);
+
+        // Admin can update any; Teacher can only update their own
+        if ($user->role === 'Teacher') {
+            abort_unless((int) $announcement->posted_by === (int) $user->user_id, 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'section_id' => 'nullable|string',
+        ]);
+
+        $sectionId = null;
+        if (!empty($validated['section_id']) && $validated['section_id'] !== 'school_wide') {
+            $sectionId = (int) $validated['section_id'];
+
+            // If teacher, verify they teach this section
+            if ($user->role === 'Teacher') {
+                $teacher = Teacher::where('user_id', $user->user_id)->firstOrFail();
+                $teachesSection = Schedule::where('teacher_id', $teacher->teacher_id)
+                    ->where('section_id', $sectionId)
+                    ->exists();
+
+                abort_unless($teachesSection, 403);
+            } else {
+                // If admin, ensure section exists
+                abort_unless(ClassSection::where('section_id', $sectionId)->exists(), 422);
+            }
+        }
+
+        $announcement->update([
+            'section_id' => $sectionId,
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+        ]);
+
+        return redirect()->route('announcements.index')->with('success', 'Announcement updated successfully.');
+    }
+
 }

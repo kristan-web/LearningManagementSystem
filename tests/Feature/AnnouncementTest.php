@@ -244,4 +244,96 @@ class AnnouncementTest extends TestCase
         $response->assertRedirect(route('announcements.index'));
         $this->assertDatabaseMissing('announcements', ['announcement_id' => $teacherAnnouncement->announcement_id]);
     }
+
+
+
+    public function test_admin_can_update_any_announcement(): void
+    {
+        $announcement = Announcement::create([
+            'posted_by' => $this->teacherUser->user_id,
+            'section_id' => $this->sectionA->section_id,
+            'title' => 'Original Title',
+            'body' => 'Original Body',
+            'posted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->put(route('announcements.update', $announcement), [
+            'title' => 'Updated Title',
+            'body' => 'Updated Body',
+            'section_id' => 'school_wide',
+        ]);
+
+        $response->assertRedirect(route('announcements.index'));
+        $this->assertDatabaseHas('announcements', [
+            'announcement_id' => $announcement->announcement_id,
+            'title' => 'Updated Title',
+            'body' => 'Updated Body',
+            'section_id' => null,
+        ]);
+    }
+
+    public function test_teacher_can_update_own_announcement(): void
+    {
+        $announcement = Announcement::create([
+            'posted_by' => $this->teacherUser->user_id,
+            'section_id' => $this->sectionA->section_id,
+            'title' => 'Original Title',
+            'body' => 'Original Body',
+            'posted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->teacherUser)->put(route('announcements.update', $announcement), [
+            'title' => 'Updated Title',
+            'body' => 'Updated Body',
+            'section_id' => (string) $this->sectionA->section_id,
+        ]);
+
+        $response->assertRedirect(route('announcements.index'));
+        $this->assertDatabaseHas('announcements', [
+            'announcement_id' => $announcement->announcement_id,
+            'title' => 'Updated Title',
+            'body' => 'Updated Body',
+            'section_id' => $this->sectionA->section_id,
+        ]);
+    }
+
+    public function test_teacher_cannot_update_others_announcement(): void
+    {
+        $adminAnnouncement = Announcement::create([
+            'posted_by' => $this->adminUser->user_id,
+            'section_id' => null,
+            'title' => 'Admin Title',
+            'body' => 'Admin Body',
+            'posted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->teacherUser)->put(route('announcements.update', $adminAnnouncement), [
+            'title' => 'Hacked Title',
+            'body' => 'Hacked Body',
+            'section_id' => 'school_wide',
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_teacher_cannot_update_to_section_they_do_not_teach(): void
+    {
+        $announcement = Announcement::create([
+            'posted_by' => $this->teacherUser->user_id,
+            'section_id' => $this->sectionA->section_id,
+            'title' => 'Original Title',
+            'body' => 'Original Body',
+            'posted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->teacherUser)->put(route('announcements.update', $announcement), [
+            'title' => 'Updated Title',
+            'body' => 'Updated Body',
+            'section_id' => (string) $this->sectionB->section_id, // Teacher doesn't teach Section B
+        ]);
+
+        $response->assertForbidden();
+    }
+
 }
+
