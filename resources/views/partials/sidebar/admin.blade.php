@@ -111,6 +111,14 @@
                      <span class="sb-tip rounded-lg bg-ink px-2.5 py-1.5 text-xs font-medium text-white shadow-lg dark:bg-slate-700">Dashboard</span>
                   </a>
                </li>
+                <li>
+                   <a href="{{ route('announcements.index') }}" class="{{ $linkBase }} {{ request()->routeIs('announcements.index') ? $linkActive : $linkIdle }}">
+                      <svg class="{{ $iconBase }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5.365V3m0 2.365c3.37 0 6.5 2.78 6.5 7.135v3.528l.89.89a.75.75 0 0 1-.53 1.282H5.14a.75.75 0 0 1-.53-1.282l.89-.89V12.5c0-4.355 3.13-7.135 6.5-7.135Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg>
+                      <span class="sb-label">Announcements</span>
+                      <span class="sb-tip rounded-lg bg-ink px-2.5 py-1.5 text-xs font-medium text-white shadow-lg dark:bg-slate-700">Announcements</span>
+                   </a>
+                </li>
+
 
                {{-- User Management --}}
                <li>
@@ -175,6 +183,9 @@
             <div class="sb-divider mx-3 my-4 hidden border-t border-ink/10 dark:border-slate-800"></div>
 
             <ul class="space-y-1">
+
+          
+
                <li>
                   <a href="{{ route('admin.documentation') }}" class="{{ $linkBase }} {{ request()->routeIs('admin.documentation') ? $linkActive : $linkIdle }}">
                      <svg class="{{ $iconBase }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4"/></svg>
