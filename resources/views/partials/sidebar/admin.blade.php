@@ -145,6 +145,10 @@
                          <li>
                             <a href="{{ route('admin.schedule.index') }}" class="{{ $subLink }} {{ $isActive('admin/schedule*') ? $subActive : $subIdle }}">Class Schedule</a>
                          </li>
+                          <li>
+                             <a href="{{ route('calendar.index') }}" class="{{ $subLink }} {{ $isActive('calendar*') ? $subActive : $subIdle }}">Events</a>
+                          </li>
+
 
                      </ul>
                   </div>

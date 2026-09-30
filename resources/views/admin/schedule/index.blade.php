@@ -15,7 +15,7 @@
     ];
     $initialForm = $reopen ? array_merge($blankForm, array_intersect_key(old(), $blankForm)) : $blankForm;
 
-    $teacherName = fn (App\Models\Teacher $t) => trim(($t->user?->last_name ?? '') . ', ' . ($t->user?->first_name ?? '')) ?: "Teacher #{$t->teacher_id}";
+    $teacherName = fn (?App\Models\Teacher $t) => $t ? (trim(($t->user?->last_name ?? '') . ', ' . ($t->user?->first_name ?? '')) ?: "Teacher #{$t->teacher_id}") : '—';
     $timeRange   = fn (App\Models\Schedule $s) => \Carbon\Carbon::parse($s->start_time)->format('h:i A') . ' – ' . \Carbon\Carbon::parse($s->end_time)->format('h:i A');
 @endphp
 

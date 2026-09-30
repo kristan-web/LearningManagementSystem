@@ -17,7 +17,7 @@ class AdminScheduleController extends Controller
 
     public function index(Request $request): View
     {
-        abort_unless($request->user()->role === 'Admin', 403);
+        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
 
         $schedules = Schedule::with(['section.strand','subject','teacher.user','room'])
             ->get()->sortBy(fn(Schedule $s)=>[
@@ -34,7 +34,7 @@ class AdminScheduleController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->role === 'Admin', 403);
+        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
         $data = $this->validateSchedule($request);
         if ($conflict = $this->detectConflict($data)) return back()->withErrors(['conflict'=>$conflict])->withInput();
         Schedule::create($data);
@@ -43,7 +43,7 @@ class AdminScheduleController extends Controller
 
     public function update(Request $request, Schedule $schedule): RedirectResponse
     {
-        abort_unless($request->user()->role === 'Admin', 403);
+        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
         $data = $this->validateSchedule($request);
         if ($conflict = $this->detectConflict($data, $schedule->schedule_id)) return back()->withErrors(['conflict'=>$conflict])->withInput();
         $schedule->update($data);
@@ -52,7 +52,7 @@ class AdminScheduleController extends Controller
 
     public function destroy(Request $request, Schedule $schedule): RedirectResponse
     {
-        abort_unless($request->user()->role === 'Admin', 403);
+        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
         $linked = $schedule->assignments()->count() + $schedule->quizzes()->count();
         if ($linked > 0) return back()->withErrors(['conflict'=>"This schedule period has {$linked} linked assignment(s)/quiz(zes) and cannot be deleted."]);
         $schedule->delete();

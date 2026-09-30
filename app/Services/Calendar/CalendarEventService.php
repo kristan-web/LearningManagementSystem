@@ -147,4 +147,32 @@ class CalendarEventService
 
         return $events->concat($assignments)->concat($quizzes)->values();
     }
+
+    /**
+     * Build the calendar feed for an admin within [$from, $to]: all schedule events.
+     */
+    public function feedForAdmin(Carbon $from, Carbon $to): Collection
+    {
+        return ScheduleEvent::where('start_datetime', '<=', $to)
+            ->where('end_datetime', '>=', $from)
+            ->get()
+            ->map(fn (ScheduleEvent $event) => [
+                'id' => 'event-' . $event->event_id,
+                'title' => $event->title,
+                'start' => $event->start_datetime,
+                'end' => $event->end_datetime,
+                'classNames' => ['fc-event--admin'], // New class for admin events
+                'extendedProps' => [
+                    'source' => 'event',
+                    'subject_name' => $event->subject?->subject_name,
+                    'description' => $event->description,
+                    'editable' => true, // Admins can edit all events
+                    'created_by_role' => $event->created_by_role,
+                    'created_by_id' => $event->created_by_id,
+                    'section_id' => $event->section_id,
+                    'subject_id' => $event->subject_id,
+                ],
+            ]);
+    }
+
 }

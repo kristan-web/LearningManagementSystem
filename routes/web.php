@@ -52,12 +52,10 @@ Route::middleware('auth')->group(function () {
 	Route::put('/admin/enrollment/{enrollment}', [EnrollmentController::class, 'update'])->name('admin.enrollment.update');
 	Route::delete('/admin/enrollment/{enrollment}', [EnrollmentController::class, 'destroy'])->name('admin.enrollment.destroy');
 	Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
-	Route::middleware('role:admin')->group(function () {
-		Route::get('/admin/schedule', [AdminScheduleController::class, 'index'])->name('admin.schedule.index');
-		Route::post('/admin/schedule', [AdminScheduleController::class, 'store'])->name('admin.schedule.store');
-		Route::put('/admin/schedule/{schedule}', [AdminScheduleController::class, 'update'])->name('admin.schedule.update');
-		Route::delete('/admin/schedule/{schedule}', [AdminScheduleController::class, 'destroy'])->name('admin.schedule.destroy');
-	});
+	Route::get('/admin/schedule', [AdminScheduleController::class, 'index'])->name('admin.schedule.index');
+	Route::post('/admin/schedule', [AdminScheduleController::class, 'store'])->name('admin.schedule.store');
+	Route::put('/admin/schedule/{schedule}', [AdminScheduleController::class, 'update'])->name('admin.schedule.update');
+	Route::delete('/admin/schedule/{schedule}', [AdminScheduleController::class, 'destroy'])->name('admin.schedule.destroy');
 	Route::post('/admin/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('admin.notifications.read-all');
 	Route::post('/admin/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('admin.notifications.read');
 	Route::view('/admin/settings', 'admin.settings.index')->name('admin.settings');
