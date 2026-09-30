@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AssignmentCommentController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EnrollmentController;
@@ -109,6 +110,8 @@ Route::middleware('auth')->group(function () {
 		Route::post('/calendar/events', [CalendarController::class, 'store'])->name('calendar.events.store');
 		Route::put('/calendar/events/{event}', [CalendarController::class, 'update'])->name('calendar.events.update');
 		Route::delete('/calendar/events/{event}', [CalendarController::class, 'destroy'])->name('calendar.events.destroy');
-		Route::view('/announcements', 'shared.announcements.index')->name('announcements.index');
+		Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+		Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+		Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 	});
 });
