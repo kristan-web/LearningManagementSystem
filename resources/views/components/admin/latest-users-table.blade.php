@@ -216,32 +216,23 @@
     </div>
 </dialog>
 
-{{-- Delete OTP Modal: code is emailed to the acting admin and required to delete --}}
+{{-- Delete OTP Modal: code is emailed to the acting admin and required to delete.
+     Same look as the forgot-password OTP page: logo, navy heading, digit boxes, navy button. --}}
 <dialog class="admin-confirm-modal" id="deleteOtpModal" aria-labelledby="delete-otp-title">
-    <form class="admin-confirm-modal__content" id="deleteOtpForm">
-        <div class="admin-confirm-modal__header">
-            <div class="flex items-center gap-3">
-                <div class="admin-confirm-modal__icon admin-otp__icon">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 id="delete-otp-title" class="admin-confirm-modal__title">Enter verification code</h2>
-                    <p id="delete-otp-status" class="admin-confirm-modal__message" aria-live="polite"></p>
-                </div>
-            </div>
-            <button type="button" class="admin-confirm-modal__close" data-otp-close aria-label="Close">&times;</button>
-        </div>
+    <form class="admin-confirm-modal__content admin-otp" id="deleteOtpForm">
+        <button type="button" class="admin-confirm-modal__close admin-otp__close" data-otp-close aria-label="Close">&times;</button>
+        <img src="{{ asset('images/Enrollment logo.png') }}" alt="" class="admin-otp__logo">
+        <h2 id="delete-otp-title" class="admin-otp__title">Confirm it's <span class="admin-otp__accent">you</span></h2>
+        <p id="delete-otp-status" class="admin-otp__hint" aria-live="polite"></p>
         <div class="admin-otp__boxes" role="group" aria-label="6-digit code">
             @for ($i = 0; $i < 6; $i++)
                 <input type="text" class="admin-otp__digit" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit {{ $i + 1 }}" {{ $i === 0 ? 'autocomplete=one-time-code' : 'autocomplete=off' }} required>
             @endfor
         </div>
         <p id="deleteOtpError" class="admin-otp__error" role="alert"></p>
-        <div class="admin-confirm-modal__actions">
-            <button type="button" class="admin-confirm-modal__btn admin-confirm-modal__btn--cancel" data-otp-close>Cancel</button>
-            <button type="submit" class="admin-confirm-modal__btn admin-confirm-modal__btn--confirm" id="deleteOtpSubmit">Delete</button>
+        <div class="admin-otp__actions">
+            <button type="button" class="admin-otp__cancel" data-otp-close>Cancel</button>
+            <button type="submit" class="btn-navy" id="deleteOtpSubmit">Delete account</button>
         </div>
     </form>
 </dialog>
@@ -699,15 +690,31 @@
     .admin-confirm-modal__btn--confirm {
         background: #ef4444; color: #fff;
     }
-    .admin-otp__icon { color: #ef4444; background: rgb(239 68 68 / 0.12); }
+    {{-- Delete OTP modal: matches the forgot-password OTP page (components/otp/verify) --}}
+    .admin-otp { position: relative; padding: 2rem 1.75rem 1.5rem; text-align: center; }
+    .admin-otp__close { position: absolute; top: 0.75rem; right: 0.75rem; }
+    .admin-otp__logo { display: block; width: 6rem; height: auto; margin: 0 auto 0.5rem; }
+    .admin-otp__title {
+        margin: 0; color: var(--ut-text);
+        font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: 1.625rem; font-weight: 700; letter-spacing: -0.02em;
+    }
+    .admin-otp__accent { background: linear-gradient(90deg, #2f5fd0, #16244f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    html.dark .admin-otp__accent { background-image: linear-gradient(90deg, #8fb0f5, #dbe5fb); }
+    .admin-otp__hint { min-height: 1.25rem; max-width: 20rem; margin: 0.5rem auto 0; color: var(--ut-muted); font-size: 0.875rem; font-weight: 500; }
+    .admin-otp__actions { display: flex; justify-content: center; gap: 0.75rem; margin-top: 1.25rem; }
+    .admin-otp__cancel {
+        min-height: 2.625rem; padding: 0.625rem 1.25rem; border: 1px solid var(--ut-input-border); border-radius: 0.75rem;
+        background: var(--ut-surface); color: var(--ut-text-soft); font-size: 0.875rem; font-weight: 600; cursor: pointer;
+        transition: background-color .15s, color .15s;
+    }
+    .admin-otp__cancel:hover { background: var(--ut-cancel-bg); color: var(--ut-text); }
     .admin-otp__boxes { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
     .admin-otp__digit {
         width: 3rem; height: 3.5rem; padding: 0;
-        border: 1.5px solid var(--ut-input-border); border-radius: 0.75rem;
+        border: 1px solid var(--ut-input-border); border-radius: 0.75rem;
         background: var(--ut-input-bg); color: var(--ut-text);
-        font-size: 1.5rem; font-weight: 700; text-align: center;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+        font-family: inherit; font-size: 1.25rem; font-weight: 700; text-align: center;
+        box-shadow: 0 1px 2px rgb(22 36 79 / 0.06);
         transition: border-color .15s, box-shadow .15s, transform .15s;
     }
     .admin-otp__digit:focus { outline: none; border-color: var(--ut-accent); box-shadow: 0 0 0 4px var(--ut-accent-ring); transform: translateY(-1px); }
