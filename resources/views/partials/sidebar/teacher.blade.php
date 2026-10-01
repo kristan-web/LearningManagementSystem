@@ -39,7 +39,7 @@
             </button>
             <ul id="dropdown-classes" class="hidden py-2 space-y-2">
                <li>
-                  <a href="{{ url('/teacher/classes') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">My Classes</a>
+                  <a href="{{ route('teacher.classes.index') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">My Classes</a>
                </li>
                <li>
                   <a href="{{ url('/teacher/schedule') }}" class="pl-10 flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">Teaching Schedule</a>
@@ -57,14 +57,14 @@
          </li>
 
          <li>
-            <a href="{{ url('/teacher/grades') }}" class="flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <a href="{{ route('teacher.grades.index') }}" class="flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4"/></svg>
                <span class="flex-1 ms-3 whitespace-nowrap">Grades & Records</span>
             </a>
          </li>
 
          <li>
-            <a href="{{ url('/teacher/attendance') }}" class="flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <a href="{{ route('teacher.attendance.index') }}" class="flex items-center px-2 py-1.5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>
                <span class="flex-1 ms-3 whitespace-nowrap">Attendance</span>
             </a>

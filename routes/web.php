@@ -18,7 +18,10 @@ use App\Http\Controllers\StudentQuizController;
 use App\Http\Controllers\StudentScheduleController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherAssignmentController;
+use App\Http\Controllers\TeacherAttendanceController;
+use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\TeacherDashboardController;
+use App\Http\Controllers\TeacherGradeController;
 use App\Http\Controllers\TeacherMaterialController;
 use App\Http\Controllers\TeacherQuizController;
 use App\Http\Controllers\TeacherScheduleController;
@@ -72,6 +75,8 @@ Route::middleware('auth')->group(function () {
 		Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
 		Route::get('/teacher/', [TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
+		Route::get('/teacher/classes', [TeacherClassController::class, 'index'])->name('teacher.classes.index');
+		Route::post('/teacher/classes', [TeacherClassController::class, 'store'])->name('teacher.classes.store');
 		Route::get('/teacher/materials', [TeacherMaterialController::class, 'index'])->name('teacher.materials.index');
 		Route::post('/teacher/materials', [TeacherMaterialController::class, 'store'])->name('teacher.materials.store');
 		Route::put('/teacher/materials/{material}', [TeacherMaterialController::class, 'update'])->name('teacher.materials.update');
@@ -83,6 +88,7 @@ Route::middleware('auth')->group(function () {
 		Route::get('/teacher/assignments/{assignment}/edit', [TeacherAssignmentController::class, 'edit'])->name('teacher.assignments.edit');
 		Route::put('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'update'])->name('teacher.assignments.update');
 		Route::delete('/teacher/assignments/{assignment}', [TeacherAssignmentController::class, 'destroy'])->name('teacher.assignments.destroy');
+		Route::put('/teacher/assignments/{assignment}/extend', [TeacherAssignmentController::class, 'extendDeadline'])->name('teacher.assignments.extend');
 		Route::get('/teacher/assignments/{assignment}/submissions', [TeacherAssignmentController::class, 'submissions'])->name('teacher.assignments.submissions');
 		Route::get('/teacher/assignments/{assignment}/view', [TeacherAssignmentController::class, 'show'])->name('teacher.assignments.show');
 		Route::put('/teacher/submissions/{submission}', [TeacherAssignmentController::class, 'grade'])->name('teacher.submissions.grade');
@@ -92,8 +98,15 @@ Route::middleware('auth')->group(function () {
 		Route::get('/teacher/quizzes/create', [TeacherQuizController::class, 'create'])->name('teacher.quizzes.create');
 		Route::post('/teacher/quizzes', [TeacherQuizController::class, 'store'])->name('teacher.quizzes.store');
 		Route::delete('/teacher/quizzes/{quiz}', [TeacherQuizController::class, 'destroy'])->name('teacher.quizzes.destroy');
+		Route::put('/teacher/quizzes/{quiz}/extend', [TeacherQuizController::class, 'extendDeadline'])->name('teacher.quizzes.extend');
+
+		Route::get('/teacher/grades', [TeacherGradeController::class, 'index'])->name('teacher.grades.index');
+		Route::get('/teacher/grades/{student}', [TeacherGradeController::class, 'show'])->name('teacher.grades.show');
 
 		Route::get('/teacher/schedule', [TeacherScheduleController::class, 'index'])->name('teacher.schedule.index');
+
+		Route::get('/teacher/attendance', [TeacherAttendanceController::class, 'index'])->name('teacher.attendance.index');
+		Route::post('/teacher/attendance', [TeacherAttendanceController::class, 'store'])->name('teacher.attendance.store');
 
 		Route::get('/student/', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 		Route::get('/student/materials', [StudentMaterialController::class, 'index'])->name('student.materials.index');

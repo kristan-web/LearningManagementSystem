@@ -81,7 +81,12 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{{ $classLabel($assignment->schedule) }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{{ $dueDisplay($assignment) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                            {{ $dueDisplay($assignment) }}
+                            @if ($assignment->isPastDue())
+                                <span class="ml-1 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-500/15 dark:text-red-300">Overdue</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{{ $assignment->max_score }}</td>
                         <td class="px-4 py-3 text-sm">
                             <span class="text-slate-600 dark:text-slate-300">{{ $assignment->submissions_count }}</span>
@@ -92,16 +97,29 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <a href="{{ route('teacher.assignments.submissions', $assignment->assignment_id) }}"
-                                   class="rounded-lg border border-blue-100 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-500 hover:text-white dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">Grade</a>
-                                <a href="{{ route('teacher.assignments.edit', $assignment->assignment_id) }}"
-                                   class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">Edit</a>
-                                <form method="POST" action="{{ route('teacher.assignments.destroy', $assignment->assignment_id) }}"
-                                      onsubmit="return confirm('Delete this assignment and all of its submissions?')">
+                            <div class="relative inline-block" x-data="{ extending: false }">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('teacher.assignments.submissions', $assignment->assignment_id) }}"
+                                       class="rounded-lg border border-blue-100 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-500 hover:text-white dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">Grade</a>
+                                    <button type="button" @click="extending = !extending"
+                                            class="rounded-lg border border-amber-200 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-500 hover:text-white dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">Extend</button>
+                                    <a href="{{ route('teacher.assignments.edit', $assignment->assignment_id) }}"
+                                       class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">Edit</a>
+                                    <form method="POST" action="{{ route('teacher.assignments.destroy', $assignment->assignment_id) }}"
+                                          onsubmit="return confirm('Delete this assignment and all of its submissions?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="rounded-lg border border-red-200 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-500 hover:text-white dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">Delete</button>
+                                    </form>
+                                </div>
+                                <form x-show="extending" x-cloak x-transition @click.outside="extending = false"
+                                      method="POST" action="{{ route('teacher.assignments.extend', $assignment->assignment_id) }}"
+                                      class="absolute right-0 z-10 mt-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 text-left shadow-lg dark:border-slate-600 dark:bg-slate-800">
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="rounded-lg border border-red-200 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-500 hover:text-white dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">Delete</button>
+                                    @method('PUT')
+                                    <input type="datetime-local" name="due_date" required
+                                           class="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+                                    <button type="submit" class="rounded-lg bg-linear-to-r from-blue-500 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:shadow-md">Save</button>
                                 </form>
                             </div>
                         </td>

@@ -138,6 +138,21 @@ class TeacherAssignmentController extends Controller
         return redirect()->route('teacher.assignments.index')->with('success', 'Assignment deleted successfully.');
     }
 
+    /** Pushes an assignment's due date forward — re-opens submission for students once it has passed. */
+    public function extendDeadline(Request $request, Assignment $assignment): RedirectResponse
+    {
+        $teacher = $this->authorizedTeacher($request);
+        $this->authorizeOwnership($assignment, $teacher->teacher_id);
+
+        $data = $request->validate([
+            'due_date' => ['required', 'date', 'after:' . $assignment->due_date],
+        ]);
+
+        $assignment->update(['due_date' => $data['due_date']]);
+
+        return redirect()->back()->with('success', 'Deadline extended successfully.');
+    }
+
     public function submissions(Request $request, Assignment $assignment): View
     {
         $teacher = $this->authorizedTeacher($request);
@@ -163,11 +178,12 @@ class TeacherAssignmentController extends Controller
 
         $data = $request->validate([
             'score' => ['required', 'numeric', 'min:0', 'max:' . $assignment->max_score],
+            'status' => ['nullable', 'string', 'in:Submitted,Late,Graded'],
         ]);
 
         $submission->update([
             'score' => $data['score'],
-            'status' => 'Graded',
+            'status' => $data['status'] ?? 'Graded',
         ]);
 
         return redirect()

@@ -203,7 +203,33 @@ class AssignmentLoopTest extends TestCase
         $this->actingAs($studentUser)->get('/student/assignments')->assertOk();
     }
 
-    public function test_late_submission_is_marked_late(): void
+    public function test_teacher_can_manually_tag_a_submission_as_late_during_grading(): void
+    {
+        Storage::fake('local');
+        [$teacherUser, $studentUser, $student, $schedule, ] = $this->world();
+
+        $assignment = Assignment::create([
+            'schedule_id' => $schedule->schedule_id, 'title' => 'Essay',
+            'due_date' => now()->addDays(7), 'max_score' => 100,
+        ]);
+
+        $this->actingAs($studentUser)->post("/student/assignments/{$assignment->assignment_id}/submit", [
+            'file' => UploadedFile::fake()->create('essay.pdf', 200),
+        ]);
+
+        $submission = Submission::first();
+
+        $this->actingAs($teacherUser)->put("/teacher/submissions/{$submission->submission_id}", [
+            'score' => 80,
+            'status' => 'Late',
+        ])->assertRedirect(route('teacher.assignments.submissions', $assignment->assignment_id));
+
+        $this->assertDatabaseHas('submissions', [
+            'submission_id' => $submission->submission_id, 'status' => 'Late', 'score' => 80,
+        ]);
+    }
+
+    public function test_submission_past_due_date_is_blocked(): void
     {
         Storage::fake('local');
         [, $studentUser, , $schedule, ] = $this->world();
@@ -213,11 +239,46 @@ class AssignmentLoopTest extends TestCase
             'due_date' => now()->addDays(-1), 'max_score' => 100,
         ]);
 
+        $this->actingAs($studentUser)->get('/student/assignments');
+
         $this->actingAs($studentUser)->post("/student/assignments/{$assignment->assignment_id}/submit", [
             'file' => UploadedFile::fake()->create('late.pdf', 100),
-        ])->assertRedirect(route('student.assignments.index'));
+        ])->assertRedirect(route('student.assignments.index'))->assertSessionHas('error');
 
-        $this->assertDatabaseHas('submissions', ['assignment_id' => $assignment->assignment_id, 'status' => 'Late']);
+        $this->assertDatabaseMissing('submissions', ['assignment_id' => $assignment->assignment_id]);
+    }
+
+    public function test_teacher_can_extend_assignment_deadline(): void
+    {
+        [$teacherUser, , , $schedule, ] = $this->world();
+
+        $assignment = Assignment::create([
+            'schedule_id' => $schedule->schedule_id, 'title' => 'Old essay',
+            'due_date' => now()->addDays(-1), 'max_score' => 100,
+        ]);
+
+        $newDueDate = now()->addDays(3);
+
+        $this->actingAs($teacherUser)->put("/teacher/assignments/{$assignment->assignment_id}/extend", [
+            'due_date' => $newDueDate->format('Y-m-d H:i:s'),
+        ])->assertRedirect();
+
+        $assignment->refresh();
+        $this->assertFalse($assignment->isPastDue());
+    }
+
+    public function test_teacher_cannot_extend_another_teachers_assignment(): void
+    {
+        [$teacherUser, , , , $otherSchedule] = $this->world();
+
+        $otherAssignment = Assignment::create([
+            'schedule_id' => $otherSchedule->schedule_id, 'title' => 'Other class essay',
+            'due_date' => now()->addDays(-1), 'max_score' => 100,
+        ]);
+
+        $this->actingAs($teacherUser)->put("/teacher/assignments/{$otherAssignment->assignment_id}/extend", [
+            'due_date' => now()->addDays(3)->format('Y-m-d H:i:s'),
+        ])->assertForbidden();
     }
 
     public function test_student_cannot_submit_assignment_outside_enrolled_section(): void

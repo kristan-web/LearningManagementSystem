@@ -74,6 +74,8 @@
                             <td class="px-3 py-2.5 text-right">
                                 @if ($submission)
                                     <span class="text-xs text-gray-400 dark:text-gray-500">Submitted {{ $submission->submitted_at?->format('M d, Y') }}</span>
+                                @elseif ($assignment->isPastDue())
+                                    <span class="text-xs font-medium text-red-500 dark:text-red-400">Deadline passed</span>
                                 @else
                                     <form method="POST" action="{{ route('student.assignments.submit', $assignment->assignment_id) }}"
                                           enctype="multipart/form-data" class="inline-flex items-center gap-2">

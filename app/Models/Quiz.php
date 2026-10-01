@@ -28,6 +28,12 @@ class Quiz extends Model
         return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 
+    /** Whether this quiz's due date has already passed (quizzes without a due date never lock). */
+    public function isPastDue(): bool
+    {
+        return $this->due_date !== null && $this->due_date->isPast();
+    }
+
     public function attempts()
     {
         return $this->hasMany(QuizAttempt::class, 'quiz_id');

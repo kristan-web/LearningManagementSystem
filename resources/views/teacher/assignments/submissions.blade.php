@@ -71,6 +71,12 @@
                                         <input type="number" name="score" min="0" max="{{ $assignment->max_score }}" step="0.01" required
                                                value="{{ $submission->score ?? '' }}"
                                                class="w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+                                        <select name="status" title="Status"
+                                                class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+                                            <option value="Graded" {{ $submission->status === 'Graded' ? 'selected' : '' }}>Graded</option>
+                                            <option value="Submitted" {{ $submission->status === 'Submitted' ? 'selected' : '' }}>Submitted</option>
+                                            <option value="Late" {{ $submission->status === 'Late' ? 'selected' : '' }}>Late</option>
+                                        </select>
                                         <button type="submit" class="rounded-lg bg-linear-to-r from-blue-500 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:shadow-md">Grade</button>
                                     </form>
                                 @endif

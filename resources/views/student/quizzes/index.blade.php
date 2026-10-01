@@ -62,6 +62,9 @@
                                     </td>
                                     <td class="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                                         {{ $quiz->due_date?->format('M d, Y h:i A') ?? '—' }}
+                                        @if ($quiz->isPastDue())
+                                            <span class="ml-1 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-500/15 dark:text-red-300">Overdue</span>
+                                        @endif
                                     </td>
                                     <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-300">{{ $used }} / {{ $quiz->attempts_allowed }}</td>
                                     <td class="px-3 py-2.5 text-sm">
@@ -72,12 +75,14 @@
                                         @endif
                                     </td>
                                     <td class="px-3 py-2.5 text-right">
-                                        @if ($active)
+                                        @if ($active && ! $quiz->isPastDue())
                                             <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 transition hover:bg-amber-500 hover:text-white dark:bg-amber-500/10 dark:text-amber-300">Resume</a>
-                                        @elseif ($canAttempt)
+                                        @elseif ($canAttempt && ! $quiz->isPastDue())
                                             <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 transition hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-300">{{ $used > 0 ? 'Retake' : 'Start' }}</a>
                                         @elseif ($best)
                                             <a href="{{ route('student.quizzes.results', [$quiz->quiz_id, $best->attempt_id]) }}" class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">Review</a>
+                                        @elseif ($quiz->isPastDue())
+                                            <span class="text-xs font-medium text-red-500 dark:text-red-400">Deadline passed</span>
                                         @else
                                             <span class="text-xs text-gray-400 dark:text-gray-500">No attempts left</span>
                                         @endif

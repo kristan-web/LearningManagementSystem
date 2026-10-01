@@ -42,6 +42,8 @@
                 @if ($submission->score !== null)
                     <span class="ml-2 text-sm font-semibold text-gray-900 dark:text-white">{{ $submission->score }} / {{ $assignment->max_score }}</span>
                 @endif
+            @elseif ($assignment->isPastDue())
+                <p class="text-sm font-medium text-red-500 dark:text-red-400">Deadline passed &mdash; ask your teacher for an extension.</p>
             @else
                 <form method="POST" action="{{ route('student.assignments.submit', $assignment->assignment_id) }}"
                       enctype="multipart/form-data" class="inline-flex items-center gap-2">

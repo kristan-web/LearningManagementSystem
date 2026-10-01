@@ -104,6 +104,12 @@ class Assignment extends Model
      * Single source of truth for the access check duplicated across
      * StudentAssignmentController/TeacherAssignmentController.
      */
+    /** Whether this assignment's due date has already passed. */
+    public function isPastDue(): bool
+    {
+        return $this->due_date !== null && $this->due_date->isPast();
+    }
+
     public function isAccessibleBy(\App\Models\User $user): bool
     {
         if ($user->role === 'Teacher') {
