@@ -2,40 +2,48 @@
 @extends('layouts.teacher')
 @section('title', $assignment->title)
 
+@php
+    $card = 'rounded-2xl border border-blue-100 bg-linear-to-b from-white to-sky-50/60 shadow-[0_12px_32px_-16px_rgb(37_99_235/0.25)] dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:shadow-none';
+    $meta = 'inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink/70 ring-1 ring-ink/10 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10';
+@endphp
+
 @section('content')
 <div class="mx-auto w-full max-w-3xl space-y-6 pt-8">
-    <a href="{{ route('teacher.assignments.index') }}" class="text-sm text-slate-500 transition hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">&larr; Back to assignments</a>
+    <a href="{{ route('teacher.assignments.index') }}" class="inline-flex items-center gap-1 text-sm font-medium text-ink/60 transition hover:text-brand dark:text-slate-400 dark:hover:text-white">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to assignments
+    </a>
 
     {{-- Post card --}}
-    <article class="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            {{ $assignment->schedule?->subject?->subject_name }} &middot; {{ $assignment->schedule?->section?->section_name }}
-        </p>
-        <h1 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{{ $assignment->title }}</h1>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            Due {{ $assignment->due_date?->format('M d, Y') }} at {{ $assignment->due_date?->format('h:i A') }}
-            &middot; Max {{ $assignment->max_score }} points
-        </p>
+    <article class="{{ $card }} overflow-hidden">
+        <div class="bg-navy px-6 py-5 text-white">
+            <p class="text-xs font-bold uppercase tracking-[1.6px] text-gold">
+                {{ $assignment->schedule?->subject?->subject_name }} &middot; {{ $assignment->schedule?->section?->section_name }}
+            </p>
+            <h1 class="mt-1 font-display text-2xl font-bold tracking-[-.4px]">{{ $assignment->title }}</h1>
+        </div>
 
-        @if ($assignment->instructions)
-            <p class="mt-4 whitespace-pre-line text-sm text-slate-700 dark:text-slate-300">{{ $assignment->instructions }}</p>
-        @endif
+        <div class="px-6 py-5">
+            <div class="flex flex-wrap gap-2">
+                <span class="{{ $meta }}">Due {{ $assignment->due_date?->format('M d, Y') }} at {{ $assignment->due_date?->format('h:i A') }}</span>
+                <span class="{{ $meta }}">Max {{ $assignment->max_score }} points</span>
+            </div>
+            @if ($assignment->instructions)
+                <p class="mt-4 whitespace-pre-line text-sm leading-relaxed text-ink/80 dark:text-slate-300">{{ $assignment->instructions }}</p>
+            @endif
+        </div>
 
-        <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4 dark:border-slate-700">
-            <span class="text-sm text-slate-600 dark:text-slate-300">{{ $assignment->submissions_count }} submitted</span>
+        <div class="flex flex-wrap items-center gap-3 border-t border-blue-100 bg-white/60 px-6 py-4 dark:border-slate-700 dark:bg-slate-900/40">
+            <span class="text-sm font-semibold text-ink dark:text-white">{{ $assignment->submissions_count }} submitted</span>
             @if ($assignment->awaiting_grading_count > 0)
                 <span class="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
                     {{ $assignment->awaiting_grading_count }} to grade
                 </span>
             @endif
-            <a href="{{ route('teacher.assignments.submissions', $assignment->assignment_id) }}"
-               class="ml-auto rounded-lg border border-blue-100 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-500 hover:text-white dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
-                View submissions
-            </a>
-            <a href="{{ route('teacher.assignments.edit', $assignment->assignment_id) }}"
-               class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                Edit
-            </a>
+            <div class="ml-auto flex gap-2">
+                <a href="{{ route('teacher.assignments.edit', $assignment->assignment_id) }}" class="st-btn-outline btn-sm">Edit</a>
+                <a href="{{ route('teacher.assignments.submissions', $assignment->assignment_id) }}" class="btn-navy btn-sm">View submissions</a>
+            </div>
         </div>
     </article>
 

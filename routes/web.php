@@ -7,20 +7,26 @@ use App\Http\Controllers\AssignmentCommentController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\MaterialDownloadController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\StudentGradeController;
 use App\Http\Controllers\StudentMaterialController;
 use App\Http\Controllers\StudentQuizController;
 use App\Http\Controllers\StudentScheduleController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SupportRequestController;
 use App\Http\Controllers\TeacherAssignmentController;
+use App\Http\Controllers\TeacherClassroomController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\TeacherMaterialController;
 use App\Http\Controllers\TeacherQuizController;
+use App\Http\Controllers\TeacherQuizReviewController;
 use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\WebAuthController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +68,12 @@ Route::middleware('auth')->group(function () {
 	Route::view('/admin/settings', 'admin.settings.index')->name('admin.settings');
 	Route::view('/admin/documentation', 'admin.help.documentation')->name('admin.documentation');
 	Route::view('/admin/support', 'admin.help.support')->name('admin.support');
+	Route::middleware('role:admin')->group(function () {
+		Route::get('/admin/support/requests', [SupportRequestController::class, 'index'])->name('admin.support.requests');
+		Route::put('/admin/support/requests/{supportRequest}', [SupportRequestController::class, 'update'])->name('admin.support.requests.update');
+		Route::get('/admin/support/requests/{supportRequest}/attachment', [SupportRequestController::class, 'attachment'])->name('admin.support.requests.attachment');
+	});
+	Route::post('/support-requests', [SupportRequestController::class, 'store'])->name('support-requests.store');
 	Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
 	Route::get('/password/change', [PasswordChangeController::class, 'edit'])->name('password.change');
@@ -94,6 +106,20 @@ Route::middleware('auth')->group(function () {
 		Route::delete('/teacher/quizzes/{quiz}', [TeacherQuizController::class, 'destroy'])->name('teacher.quizzes.destroy');
 
 		Route::get('/teacher/schedule', [TeacherScheduleController::class, 'index'])->name('teacher.schedule.index');
+		Route::get('/teacher/classes', [TeacherClassroomController::class, 'classes'])->name('teacher.classes.index');
+		Route::get('/teacher/grades', [TeacherClassroomController::class, 'grades'])->name('teacher.grades.index');
+		Route::get('/teacher/attendance', [TeacherClassroomController::class, 'attendance'])->name('teacher.attendance.index');
+		Route::post('/teacher/attendance', [TeacherClassroomController::class, 'saveAttendance'])->name('teacher.attendance.store');
+		Route::get('/teacher/communication', [MessageController::class, 'index'])->name('teacher.communication.index');
+		Route::view('/teacher/documentation', 'teacher.help.documentation')->name('teacher.documentation');
+		Route::view('/teacher/support', 'teacher.help.support')->name('teacher.support');
+		Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+		Route::get('/messages/{message}/attachment', [MessageController::class, 'attachment'])->name('messages.attachment');
+		Route::post('/teacher/grades/final', [TeacherClassroomController::class, 'saveFinalGrades'])->name('teacher.grades.final');
+		Route::get('/teacher/quizzes/{quiz}/edit', [TeacherQuizReviewController::class, 'edit'])->name('teacher.quizzes.edit');
+		Route::put('/teacher/quizzes/{quiz}', [TeacherQuizReviewController::class, 'update'])->name('teacher.quizzes.update');
+		Route::get('/teacher/quizzes/{quiz}/results', [TeacherQuizReviewController::class, 'results'])->name('teacher.quizzes.results');
+		Route::get('/teacher/quizzes/{quiz}/attempts/{attempt}', [TeacherQuizReviewController::class, 'attempt'])->name('teacher.quizzes.attempt');
 
 		Route::get('/student/', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 		Route::get('/student/materials', [StudentMaterialController::class, 'index'])->name('student.materials.index');
@@ -102,6 +128,13 @@ Route::middleware('auth')->group(function () {
 		Route::get('/student/assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('student.assignments.show');
 		Route::post('/student/assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('student.assignments.submit');
 		Route::get('/student/schedule', [StudentScheduleController::class, 'index'])->name('student.schedule.index');
+		Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
+		Route::get('/student/communication', [MessageController::class, 'index'])->name('student.communication.index');
+		Route::get('/student/grades', [StudentGradeController::class, 'index'])->name('student.grades.index');
+		// UI-only student page: swap Route::view for a controller once this module has data.
+		Route::view('/student/enrollment', 'student.enrollment.index')->name('student.enrollment.index');
+		Route::view('/student/documentation', 'student.help.documentation')->name('student.documentation');
+		Route::view('/student/support', 'student.help.support')->name('student.support');
 
 		Route::post('/assignments/{assignment}/comments', [AssignmentCommentController::class, 'store'])->name('assignments.comments.store');
 		Route::delete('/assignments/{assignment}/comments/{comment}', [AssignmentCommentController::class, 'destroy'])->name('assignments.comments.destroy');

@@ -99,7 +99,8 @@
         </a>
 
         <nav class="ml-auto flex items-center">
-            <a href="{{ route('login') }}" class="group relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-xl bg-linear-150 from-[#3a52a0] to-ink to-78% px-5 text-sm font-bold whitespace-nowrap text-white shadow-[0_8px_18px_rgba(22,36,79,.3),inset_0_1px_0_rgba(255,255,255,.18)] transition before:pointer-events-none before:absolute before:inset-y-0 before:-left-[80%] before:w-1/2 before:-skew-x-[20deg] before:bg-linear-[105deg,transparent,rgba(255,255,255,.35),transparent] hover:-translate-y-px hover:shadow-[0_12px_24px_rgba(22,36,79,.4)] hover:before:animate-sheen">
+            {{-- Same .btn-navy as the login and portal pages --}}
+            <a href="{{ route('login') }}" class="btn-navy group">
                 LMS
                 <svg class="size-4 transition group-hover:translate-x-[3px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
