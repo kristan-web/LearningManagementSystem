@@ -51,6 +51,16 @@ class WebAuthController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
+        // Every teacher page loads the teacher profile with firstOrFail(), so a Teacher account with no
+        // `teachers` row (role switched outside the admin form) got a 404 on /teacher. Create it here;
+        // the placeholder number is unique per user and the admin can replace it in Edit Account.
+        if ($user->role === 'Teacher') {
+            \App\Models\Teacher::firstOrCreate(
+                ['user_id' => $user->user_id],
+                ['teacher_number' => 'TCH-PENDING-' . $user->user_id, 'specialization' => ''],
+            );
+        }
+
         if ($user->must_change_password && in_array($user->role, ['Teacher', 'Student'], true)) {
             return redirect()->route('password.change');
         }

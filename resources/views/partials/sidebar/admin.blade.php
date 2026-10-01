@@ -250,7 +250,8 @@
                <span class="sb-tip rounded-lg bg-ink px-2.5 py-1.5 text-xs font-medium text-white shadow-lg dark:bg-slate-700" x-text="dark ? 'Light mode' : 'Dark mode'"></span>
             </button>
 
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}"
+                  data-confirm="Log out?" data-confirm-text="You will need to sign in again to use the admin panel." data-confirm-button="Log out">
                @csrf
                <button type="submit" class="{{ $linkBase }} sb-logout w-full text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-sm dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300">
                   <svg class="{{ $iconBase }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>

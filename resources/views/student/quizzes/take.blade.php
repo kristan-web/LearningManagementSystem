@@ -3,7 +3,8 @@
 @section('title', $quiz->title)
 
 @php
-    $card = 'rounded-2xl border border-blue-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800';
+    $card = 'rounded-2xl border border-blue-100 bg-linear-to-b from-white to-sky-50/60 p-6 shadow-[0_12px_32px_-16px_rgb(37_99_235/0.25)] dark:border-slate-700 dark:from-slate-800 dark:to-slate-900 dark:shadow-none';
+    $choice = 'flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#d5dcec] bg-white px-3.5 py-2.5 text-sm text-ink/80 transition hover:border-[#c9d6f5] hover:bg-[#f5f7fd] has-[:checked]:border-brand has-[:checked]:bg-[#eef3fd] has-[:checked]:font-semibold has-[:checked]:text-ink dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-700/50 dark:has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-500/15 dark:has-[:checked]:text-white';
 @endphp
 
 @section('content')
@@ -27,57 +28,67 @@
      }"
      x-init="deadline && (tick(), setInterval(() => tick(), 1000))">
 
-    <a href="{{ route('student.quizzes.index') }}" class="text-sm text-gray-500 transition hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">&larr; Back to quizzes</a>
+    <a href="{{ route('student.quizzes.index') }}" class="inline-flex items-center gap-1 text-sm font-medium text-ink/60 transition hover:text-brand dark:text-slate-400 dark:hover:text-white">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to quizzes
+    </a>
 
-    <div class="{{ $card }} flex items-center justify-between">
+    <div class="bg-navy flex items-center justify-between gap-4 rounded-2xl px-6 py-5 text-white shadow-[0_14px_32px_-14px_rgb(22_36_79/0.55)]">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ $quiz->title }}</h1>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $quiz->schedule?->subject?->subject_name }} &middot; {{ count($questions) }} question(s)</p>
+            <p class="text-xs font-bold uppercase tracking-[1.6px] text-gold">{{ $quiz->schedule?->subject?->subject_name }}</p>
+            <h1 class="mt-1 font-display text-2xl font-bold tracking-[-.4px]">{{ $quiz->title }}</h1>
+            <p class="mt-1 text-sm text-white/70">{{ count($questions) }} question(s)</p>
         </div>
         <template x-if="deadline">
-            <div class="rounded-xl bg-amber-100 px-4 py-2 text-center dark:bg-amber-500/15">
-                <p class="text-xs font-medium uppercase tracking-wide text-amber-700 dark:text-amber-300">Time left</p>
-                <p class="text-xl font-bold text-amber-800 dark:text-amber-200" x-text="display"></p>
+            <div class="rounded-xl bg-white/10 px-4 py-2 text-center ring-1 ring-white/20">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gold">Time left</p>
+                <p class="font-display text-xl font-bold" x-text="display"></p>
             </div>
         </template>
     </div>
 
-    <form method="POST" action="{{ route('student.quizzes.submit', [$quiz->quiz_id, $attempt->attempt_id]) }}" x-ref="quizForm" class="space-y-4">
+    <form method="POST" action="{{ route('student.quizzes.submit', [$quiz->quiz_id, $attempt->attempt_id]) }}" x-ref="quizForm" class="space-y-4"
+          data-confirm="Submit your answers?" data-confirm-text="You can't change your answers after you submit." data-confirm-button="Submit quiz">
         @csrf
 
         @foreach ($questions as $index => $question)
             <div class="{{ $card }}">
-                <p class="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">Question {{ $index + 1 }}</p>
-                <p class="mt-1 text-base font-medium text-slate-900 dark:text-white">{{ $question->question_text }}</p>
+                <div class="flex items-start gap-3">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white dark:bg-blue-500">{{ $index + 1 }}</span>
+                    <p class="pt-0.5 text-base font-semibold text-ink dark:text-white">{{ $question->question_text }}</p>
+                </div>
 
                 @if ($question->question_type === 'multiple_choice')
-                    <div class="mt-3 space-y-2">
+                    <div class="mt-4 space-y-2">
                         @foreach ($question->shuffledOptions($attempt->attempt_id) as $option)
-                            <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700/50">
-                                <input type="radio" name="answers[{{ $question->question_id }}]" value="{{ $option }}" required class="text-blue-600 focus:ring-blue-500">
+                            <label class="{{ $choice }}">
+                                <input type="radio" name="answers[{{ $question->question_id }}]" value="{{ $option }}" required class="accent-brand">
                                 {{ $option }}
                             </label>
                         @endforeach
                     </div>
                 @elseif ($question->question_type === 'true_false')
-                    <div class="mt-3 flex gap-4">
-                        <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-200">
-                            <input type="radio" name="answers[{{ $question->question_id }}]" value="true" required class="text-blue-600 focus:ring-blue-500"> True
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <label class="{{ $choice }}">
+                            <input type="radio" name="answers[{{ $question->question_id }}]" value="true" required class="accent-brand"> True
                         </label>
-                        <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-200">
-                            <input type="radio" name="answers[{{ $question->question_id }}]" value="false" required class="text-blue-600 focus:ring-blue-500"> False
+                        <label class="{{ $choice }}">
+                            <input type="radio" name="answers[{{ $question->question_id }}]" value="false" required class="accent-brand"> False
                         </label>
                     </div>
                 @else
                     <input type="text" name="answers[{{ $question->question_id }}]" required
-                           class="mt-3 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+                           class="mt-4 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-ink placeholder-slate-400 shadow-xs transition focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-blue-400"
                            placeholder="Your answer">
                 @endif
             </div>
         @endforeach
 
         <div class="flex justify-end">
-            <button type="submit" class="rounded-lg bg-linear-to-r from-blue-500 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:shadow-blue-500/40">Submit Quiz</button>
+            <button type="submit" class="btn-navy">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Submit Quiz
+            </button>
         </div>
     </form>
 </div>
