@@ -84,21 +84,8 @@
         @keyframes owl-flap-r { 50% { transform: rotate(-35deg); } }
         @keyframes owl-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
-        .owl-bubble {
-            position: absolute; top: 100%; right: .25rem; margin-top: .25rem;
-            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #dbe5fb;
-            background: #fff; color: #16244f; font-size: .75rem; font-weight: 600; white-space: nowrap;
-            box-shadow: 0 10px 24px -10px rgba(22, 36, 79, .45);
-            opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: top right; pointer-events: none;
-            transition: opacity .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
-        }
-        .owl-bubble.show { opacity: 1; transform: none; }
-        @media (min-width: 640px) {
-            .owl-bubble { top: 1.75rem; right: 100%; margin: 0 .5rem 0 0; transform: translateX(4px) scale(.9); transform-origin: right center; }
-        }
         @media (prefers-reduced-motion: reduce) {
             .owl * { animation: none !important; transition: none !important; }
-            .owl-bubble { transition: none; }
         }
     </style>
 </head>
@@ -118,7 +105,6 @@
 
             {{-- Owl mascot: each page adds its own behaviour on top of window.Owl --}}
             <div class="absolute top-4 right-4 sm:top-6 sm:right-10 z-10 select-none" aria-hidden="true">
-                <div id="owl-bubble" class="owl-bubble"></div>
                 <svg id="owl" class="owl block w-20 sm:w-28 lg:w-32 h-auto" viewBox="0 0 160 150">
                     <defs>
                         <radialGradient id="owl-g-body" cx="40%" cy="30%" r="75%">
@@ -234,7 +220,6 @@
         // Shared owl helpers; pages add their own behaviour.
         window.Owl = (function () {
             var owl = document.getElementById('owl');
-            var bubble = document.getElementById('owl-bubble');
             var pupils = owl.querySelectorAll('.owl-pupil');
             var timers = {};
 
@@ -252,12 +237,9 @@
                 if (name) owl.setAttribute('data-mood', name); else owl.removeAttribute('data-mood');
                 if (ms) timers.mood = setTimeout(function () { setMood(''); }, ms);
             }
-            function say(text, ms) {
-                bubble.textContent = text;
-                bubble.classList.add('show');
+            // Silent reactions only: the owl moves its mouth, no speech bubble text.
+            function say() {
                 play('talk', 500);
-                clearTimeout(timers.say);
-                timers.say = setTimeout(function () { bubble.classList.remove('show'); }, ms || 2200);
             }
             function lookAt(x, y) {
                 var r = owl.getBoundingClientRect();

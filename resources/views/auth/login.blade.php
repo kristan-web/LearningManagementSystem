@@ -135,27 +135,8 @@
         @keyframes owl-z { 0% { opacity: 0; transform: scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -26px) scale(1.2); } }
         @keyframes owl-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
-        /* Owl speech bubble */
-        .owl-bubble {
-            position: absolute; top: 100%; right: .25rem; margin-top: .25rem;
-            padding: .4rem .75rem; border-radius: 1rem; border: 1px solid #dbe5fb;
-            background: #fff; color: #16244f; font-size: .75rem; font-weight: 600; white-space: nowrap;
-            box-shadow: 0 10px 24px -10px rgba(22, 36, 79, .45);
-            opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: top right; pointer-events: none;
-            transition: opacity .2s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
-        }
-        .owl-bubble::after {
-            content: ""; position: absolute; top: -6px; right: 1.75rem; width: 10px; height: 10px;
-            background: #fff; border-left: 1px solid #dbe5fb; border-top: 1px solid #dbe5fb; transform: rotate(45deg);
-        }
-        .owl-bubble.show { opacity: 1; transform: none; }
-        @media (min-width: 640px) {
-            .owl-bubble { top: 1.75rem; right: 100%; margin: 0 .5rem 0 0; transform: translateX(4px) scale(.9); transform-origin: right center; }
-            .owl-bubble::after { top: 50%; right: -6px; margin-top: -5px; border: 0; border-top: 1px solid #dbe5fb; border-right: 1px solid #dbe5fb; }
-        }
         @media (prefers-reduced-motion: reduce) {
             .owl * { animation: none !important; transition: none !important; }
-            .owl-bubble { transition: none; }
         }
     </style>
 </head>
@@ -206,7 +187,6 @@
 
             {{-- Owl mascot: eyes follow the cursor, covers eyes on password --}}
             <div class="absolute top-4 right-4 sm:top-6 sm:right-10 z-10 select-none" aria-hidden="true">
-                <div id="owl-bubble" class="owl-bubble"></div>
                 <svg id="owl" class="owl block w-20 sm:w-28 lg:w-32 h-auto cursor-pointer" viewBox="0 0 160 150">
                     <defs>
                         <radialGradient id="owl-g-body" cx="40%" cy="30%" r="75%">
@@ -503,7 +483,6 @@
             var toggle = document.getElementById('toggle-password');
             if (!owl || !email || !pw) return;
 
-            var bubble = document.getElementById('owl-bubble');
             var pupils = owl.querySelectorAll('.owl-pupil');
             var locked = false;
             var timers = {};
@@ -526,13 +505,9 @@
                 if (ms) timers.mood = setTimeout(function () { setMood(''); }, ms);
             }
 
-            function say(text, ms) {
-                if (!bubble) return;
-                bubble.textContent = text;
-                bubble.classList.add('show');
+            // Silent reactions only: the owl moves its mouth, no speech bubble text.
+            function say() {
                 play('talk', 500);
-                clearTimeout(timers.say);
-                timers.say = setTimeout(function () { bubble.classList.remove('show'); }, ms || 2200);
             }
 
             // Any user activity resets the sleep timer and wakes the owl up
