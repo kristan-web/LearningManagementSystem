@@ -33,6 +33,65 @@
                 </div>
             </div>
 
+            <table class="mt-4 w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                        <th class="px-3 py-2">Assignment</th>
+                        <th class="px-3 py-2">Subject</th>
+                        <th class="px-3 py-2">Due</th>
+                        <th class="px-3 py-2">Status</th>
+                        <th class="px-3 py-2">Score</th>
+                        <th class="px-3 py-2 text-right">Submit</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                    @forelse ($assignments as $assignment)
+                        @php $submission = $firstSubmission($assignment); @endphp
+                        <tr class="align-top">
+                            <td class="px-3 py-2.5">
+                                <a href="{{ route('student.assignments.show', $assignment->assignment_id) }}" class="font-medium text-gray-900 hover:underline dark:text-white">{{ $assignment->title }}</a>
+                                @if ($assignment->instructions)
+                                    <p class="mt-0.5 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">{{ $assignment->instructions }}</p>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-300">{{ $assignment->schedule?->subject?->subject_name }}</td>
+                            <td class="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                {{ $assignment->due_date?->format('M d, Y') }}<br>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ $assignment->due_date?->format('h:i A') }}</span>
+                            </td>
+                            <td class="px-3 py-2.5">
+                                @if ($submission)
+                                    <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold {{ $statusBadge[$submission->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }}">
+                                        {{ $submission->status }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">Not submitted</span>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2.5 text-sm">
+                                @if ($submission?->score !== null)
+                                    <span class="font-semibold text-gray-900 dark:text-white">{{ $submission->score }}</span>
+                                    <span class="text-gray-400 dark:text-gray-500">/ {{ $assignment->max_score }}</span>
+                                @else
+                                    <span class="text-gray-400 dark:text-gray-500">&mdash;</span>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2.5 text-right">
+                                @if ($submission)
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">Submitted {{ $submission->submitted_at?->format('M d, Y') }}</span>
+                                @elseif ($assignment->isPastDue())
+                                    <span class="text-xs font-medium text-red-500 dark:text-red-400">Deadline passed</span>
+                                @else
+                                    <form method="POST" action="{{ route('student.assignments.submit', $assignment->assignment_id) }}"
+                                          enctype="multipart/form-data" class="inline-flex items-center gap-2">
+                                        @csrf
+                                        <input type="file" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip" class="max-w-32 text-xs">
+                                        <button type="submit" class="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 transition hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-300">Submit</button>
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
             <div class="st-table-wrap mt-3">
                 <table class="st-table">
                     <thead>

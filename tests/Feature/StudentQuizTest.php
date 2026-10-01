@@ -175,6 +175,36 @@ class StudentQuizTest extends TestCase
         $this->assertSame(2, QuizAttempt::where('quiz_id', $quiz->quiz_id)->count());
     }
 
+    public function test_student_cannot_start_quiz_past_due_date(): void
+    {
+        [$studentUser, , $schedule] = $this->world();
+        $quiz = $this->quizWithQuestions($schedule->schedule_id);
+        $quiz->update(['due_date' => now()->subDay()]);
+
+        $this->actingAs($studentUser)->get("/student/quizzes/{$quiz->quiz_id}/take")->assertForbidden();
+    }
+
+    public function test_student_cannot_submit_quiz_past_due_date(): void
+    {
+        [$studentUser, $student, $schedule] = $this->world();
+        $quiz = $this->quizWithQuestions($schedule->schedule_id);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id' => $quiz->quiz_id, 'student_id' => $student->student_id,
+            'started_at' => now()->subMinutes(10),
+        ]);
+
+        $quiz->update(['due_date' => now()->subDay()]);
+
+        $this->actingAs($studentUser)->post(
+            "/student/quizzes/{$quiz->quiz_id}/attempts/{$attempt->attempt_id}/submit",
+            ['answers' => []]
+        )->assertForbidden();
+
+        $attempt->refresh();
+        $this->assertNull($attempt->submitted_at);
+    }
+
     public function test_student_cannot_take_quiz_outside_enrolled_section(): void
     {
         [$studentUser, , , $otherSchedule] = $this->world();

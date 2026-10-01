@@ -73,10 +73,9 @@ class StudentAssignmentController extends Controller
             return redirect()->back()->with('error', 'You have already submitted this assignment.');
         }
 
-        // Compare in SQL — the established idiom (see StudentDashboardService).
-        $isLate = Assignment::where('assignment_id', $assignment->assignment_id)
-            ->where('due_date', '<', now())
-            ->exists();
+        if ($assignment->isPastDue()) {
+            return redirect()->back()->with('error', 'The deadline for this assignment has passed. Ask your teacher for an extension.');
+        }
 
         $path = $request->file('file')->store('submissions/' . $assignment->assignment_id, self::DISK);
 
@@ -85,7 +84,7 @@ class StudentAssignmentController extends Controller
             'student_id' => $student->student_id,
             'submitted_at' => now(),
             'file_url' => $path,
-            'status' => $isLate ? 'Late' : 'Submitted',
+            'status' => 'Submitted',
         ]);
 
         return redirect()->route('student.assignments.index')->with('success', 'Assignment submitted successfully.');

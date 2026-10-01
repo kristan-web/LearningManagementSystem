@@ -98,6 +98,24 @@ class TeacherQuizController extends Controller
         return redirect()->route('teacher.quizzes.index')->with('success', 'Quiz deleted successfully.');
     }
 
+    /** Pushes a quiz's due date forward — re-opens attempts for students once it has passed. */
+    public function extendDeadline(Request $request, Quiz $quiz): RedirectResponse
+    {
+        $teacher = $this->authorizedTeacher($request);
+        $this->authorizeOwnership($quiz, $teacher->teacher_id);
+
+        // Quizzes may have no due date yet — fall back to "after now" so a first deadline can be set.
+        $after = $quiz->due_date ?? now();
+
+        $data = $request->validate([
+            'due_date' => ['required', 'date', 'after:' . $after],
+        ]);
+
+        $quiz->update(['due_date' => $data['due_date']]);
+
+        return redirect()->route('teacher.quizzes.index')->with('success', 'Deadline extended successfully.');
+    }
+
     private function authorizedTeacher(Request $request): Teacher
     {
         abort_unless($request->user()->role === 'Teacher', 403);

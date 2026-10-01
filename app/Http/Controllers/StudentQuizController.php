@@ -50,6 +50,7 @@ class StudentQuizController extends Controller
     {
         $student = $this->authorizedStudent($request);
         $this->authorizeAccess($quiz, $student);
+        abort_if($quiz->isPastDue(), 403, 'The deadline for this quiz has passed. Ask your teacher for an extension.');
 
         $attempt = QuizAttempt::where('quiz_id', $quiz->quiz_id)
             ->where('student_id', $student->student_id)
@@ -86,6 +87,7 @@ class StudentQuizController extends Controller
         $this->authorizeAccess($quiz, $student);
         abort_unless($attempt->quiz_id === $quiz->quiz_id && $attempt->student_id === $student->student_id, 403);
         abort_if($attempt->submitted_at !== null, 403, 'This attempt has already been submitted.');
+        abort_if($quiz->isPastDue(), 403, 'The deadline for this quiz has passed. Ask your teacher for an extension.');
 
         $submitted = $request->input('answers', []);
         $questions = $quiz->questions()->get();

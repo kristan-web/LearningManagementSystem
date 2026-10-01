@@ -143,6 +143,46 @@ class TeacherQuizTest extends TestCase
         $this->assertDatabaseHas('quizzes', ['quiz_id' => $quiz->quiz_id]);
     }
 
+    public function test_teacher_can_extend_quiz_deadline(): void
+    {
+        [$user, , $schedule] = $this->world();
+        $quiz = Quiz::create([
+            'schedule_id' => $schedule->schedule_id, 'title' => 'Quiz 1', 'attempts_allowed' => 1,
+            'due_date' => now()->subDay(),
+        ]);
+
+        $newDueDate = now()->addDays(3);
+
+        $this->actingAs($user)->put("/teacher/quizzes/{$quiz->quiz_id}/extend", [
+            'due_date' => $newDueDate->format('Y-m-d H:i:s'),
+        ])->assertRedirect(route('teacher.quizzes.index'));
+
+        $quiz->refresh();
+        $this->assertFalse($quiz->isPastDue());
+    }
+
+    public function test_teacher_can_set_first_deadline_on_quiz_without_one(): void
+    {
+        [$user, , $schedule] = $this->world();
+        $quiz = Quiz::create(['schedule_id' => $schedule->schedule_id, 'title' => 'No deadline yet', 'attempts_allowed' => 1]);
+
+        $this->actingAs($user)->put("/teacher/quizzes/{$quiz->quiz_id}/extend", [
+            'due_date' => now()->addDays(3)->format('Y-m-d H:i:s'),
+        ])->assertRedirect(route('teacher.quizzes.index'));
+
+        $this->assertNotNull($quiz->refresh()->due_date);
+    }
+
+    public function test_teacher_cannot_extend_another_teachers_quiz(): void
+    {
+        [$user, , , $otherSchedule] = $this->world();
+        $quiz = Quiz::create(['schedule_id' => $otherSchedule->schedule_id, 'title' => 'Not yours', 'attempts_allowed' => 1]);
+
+        $this->actingAs($user)->put("/teacher/quizzes/{$quiz->quiz_id}/extend", [
+            'due_date' => now()->addDays(3)->format('Y-m-d H:i:s'),
+        ])->assertForbidden();
+    }
+
     public function test_non_teacher_role_is_forbidden_from_teacher_quizzes(): void
     {
         $admin = User::create([
