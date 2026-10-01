@@ -1,314 +1,144 @@
-{{-- Admin: Create User --}}
+{{-- Admin: Create User (layout unchanged; the <style> block is the navy visual layer. The script relies on the ids/classes.) --}}
 @extends('layouts.admin')
 @section('title', 'Create Account')
 
 @section('styles')
     <style>
-        .create-form-container {
-            max-width: 72rem;
-            margin: 0 auto;
-        }
-        .create-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        .create-form-grid .full-width {
-            grid-column: span 2;
-        }
-        @media (max-width: 640px) {
-            .create-form-grid {
-                grid-template-columns: 1fr;
-            }
-            .create-form-grid .full-width {
-                grid-column: span 1;
-            }
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #455072;
-            margin-bottom: 0.375rem;
-        }
-        .form-group label.required::after {
-            content: ' *';
-            color: #ef4444;
-        }
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            color: #16244f;
-            background: #fff;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #2f5fd0;
-            ring: 2px solid #2f5fd0;
-        }
-        .form-group input::placeholder,
-        .form-group select::placeholder {
-            color: #9ca3af;
-        }
-        .dark .form-group input,
-        .dark .form-group select {
-            background: #374151;
-            border-color: #4b5563;
-            color: #f9fafb;
-        }
-        .dark .form-group input:focus,
-        .dark .form-group select:focus {
-            border-color: #2f5fd0;
-        }
-        .dark .form-section {
-            background: #1f2937;
-            border-color: #374151;
-        }
-        .dark .form-section h3 {
-            color: #fff;
-        }
-        .dark .btn-cancel {
-            background: #374151;
-            color: #fff;
-            border-color: #4b5563;
-        }
-        .dark .btn-cancel:hover {
-            background: #4b5563;
-        }
-        .dark .form-group .error-text {
-            color: #f87171;
-        }
+        /* Same form layout as before; visual layer only (navy "official form" look). Class names below are also used by the script. */
+        .create-form-container { max-width: 72rem; margin: 0 auto; }
+
+        /* Header */
+        .chart-center { padding-top: 2rem; padding-bottom: 1rem; text-align: start; max-width: 72rem; margin: 0 auto 1rem auto; width: 100%; }
+        .ca-eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: .6875rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #c85a08; }
+        .ca-eyebrow::before { content: ''; width: 1.25rem; height: 2px; border-radius: 2px; background: currentColor; }
+        html.dark .ca-eyebrow { color: #f4b301; }
+
+        /* Sections: navy band header with dot texture + gold hairline */
         .form-section {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            position: relative; overflow: hidden; margin-bottom: 1.5rem; border: 1px solid #e3e8f4; border-radius: 1.25rem; background: #fff;
+            box-shadow: 0 1px 2px rgb(22 36 79 / .04), 0 18px 40px -24px rgb(22 36 79 / .35);
         }
         .form-section h3 {
-            margin: 0 0 1rem 0;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #16244f;
+            position: relative; display: flex; align-items: center; gap: .75rem; margin: 0; padding: 1.05rem 1.75rem;
+            background-image: radial-gradient(rgb(255 255 255 / .10) 1px, transparent 1px), linear-gradient(158deg, #24386f, #16244f 58%, #0f1a38);
+            background-size: 16px 16px, auto; color: #fff;
+            font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: 1.0625rem; font-weight: 700; letter-spacing: -.01em;
         }
-        .btn-cancel {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.625rem 1.25rem;
-            background: #fff;
-            color: #455072;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-cancel:hover {
-            background: #f3f4f6;
+        .form-section h3::before { content: ''; width: .5rem; height: .5rem; flex: none; border-radius: 9999px; background: #f4b301; box-shadow: 0 0 0 4px rgb(244 179 1 / .22); }
+        .form-section h3::after { content: ''; position: absolute; inset: auto 0 0 0; height: 2px; background: linear-gradient(90deg, transparent, #f4b301 30%, #f4b301 70%, transparent); opacity: .75; }
+        html.dark .form-section { background: #0f1a38; border-color: #24386f; box-shadow: none; }
+
+        .create-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; padding: 1.5rem 1.75rem .5rem; }
+        .create-form-grid .full-width { grid-column: 1 / -1; }
+        @media (max-width: 640px) {
+            .create-form-grid { grid-template-columns: 1fr; padding: 1.25rem 1.25rem .25rem; }
+            .create-form-grid .full-width { grid-column: span 1; }
+            .form-section h3 { padding: 1rem 1.25rem; }
         }
 
-        {{-- Password Strength & Toggle --}}
-        .password-wrapper {
-            position: relative;
+        /* Fields: tinted fill, small caps labels, navy focus */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group > label { display: block; margin-bottom: .45rem; font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: rgb(22 36 79 / .6); }
+        .form-group > label.required::after { content: ' *'; color: #e11d48; }
+        .form-group input, .form-group select {
+            width: 100%; height: 2.875rem; padding: 0 .95rem; border: 1.5px solid transparent; border-radius: .8rem;
+            background: #f2f5fb; color: #16244f; font-size: .9rem; font-weight: 500;
+            transition: background-color .15s, border-color .15s, box-shadow .15s;
         }
-        .password-wrapper input {
-            padding-right: 3rem;
+        .form-group input:hover, .form-group select:hover { background: #ecf0f9; }
+        .form-group input:focus, .form-group select:focus { outline: none; background: #fff; border-color: #2f5fd0; box-shadow: 0 0 0 4px rgb(47 95 208 / .13); }
+        .form-group input::placeholder { color: #9aa3b8; font-weight: 400; }
+        .form-group .error-text { display: flex; align-items: center; gap: .35rem; margin-top: .4rem; font-size: .75rem; font-weight: 600; color: #e11d48; }
+        .form-group .error-text::before { content: '!'; display: inline-flex; height: 1rem; width: 1rem; align-items: center; justify-content: center; border-radius: 9999px; background: #e11d48; color: #fff; font-size: .625rem; font-weight: 800; }
+        html.dark .form-group > label { color: #94a3b8; }
+        html.dark .form-group input, html.dark .form-group select { background: rgb(255 255 255 / .05); color: #f8fafc; }
+        html.dark .form-group input:hover, html.dark .form-group select:hover { background: rgb(255 255 255 / .08); }
+        html.dark .form-group input:focus, html.dark .form-group select:focus { background: #0f172a; border-color: #60a5fa; box-shadow: 0 0 0 4px rgb(96 165 250 / .2); }
+        html.dark .form-group .error-text { color: #fb7185; }
+
+        /* Password toggle, strength and match (class names are set by the script) */
+        .password-wrapper, .confirm-password-wrapper { position: relative; }
+        .password-wrapper input, .confirm-password-wrapper input { padding-right: 3rem; }
+        .password-toggle, .confirm-password-toggle {
+            position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); display: flex; padding: .35rem; border: none; border-radius: .5rem;
+            background: none; color: rgb(22 36 79 / .45); cursor: pointer; transition: background-color .15s, color .15s;
         }
-        .password-toggle {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 0.25rem;
-            display: flex;
-        }
-        .password-toggle:hover {
-            color: #2f5fd0;
-        }
-        .password-strength {
-            height: 4px;
-            border-radius: 2px;
-            background: #e5e7eb;
-            margin-top: 0.375rem;
-            overflow: hidden;
-        }
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            border-radius: 2px;
-            transition: width 0.3s, background-color 0.3s;
-        }
+        .password-toggle:hover, .confirm-password-toggle:hover { background: rgb(47 95 208 / .1); color: #2f5fd0; }
+        .password-strength { height: 5px; margin-top: .5rem; overflow: hidden; border-radius: 9999px; background: #e8ecf5; }
+        .password-strength-bar { height: 100%; width: 0%; border-radius: 9999px; transition: width .3s, background-color .3s; }
         .password-strength-bar.weak { width: 33%; background-color: #ef4444; }
         .password-strength-bar.medium { width: 66%; background-color: #f59e0b; }
-        .password-strength-bar.strong { width: 100%; background-color: #10b981; }
-        .password-strength-text {
-            font-size: 0.7rem;
-            margin-top: 0.125rem;
-        }
+        .password-strength-bar.strong { width: 100%; background: linear-gradient(90deg, #10b981, #059669); }
+        .password-strength-text { display: block; margin-top: .3rem; font-size: .6875rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
         .password-strength-text.weak { color: #ef4444; }
-        .password-strength-text.medium { color: #f59e0b; }
-        .password-strength-text.strong { color: #10b981; }
-        .confirm-password-wrapper {
-            position: relative;
-        }
-        .confirm-password-wrapper input {
-            padding-right: 3rem;
-        }
-        .confirm-password-toggle {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 0.25rem;
-            display: flex;
-        }
-        .confirm-password-toggle:hover {
-            color: #2f5fd0;
-        }
-        .password-match-msg {
-            font-size: 0.75rem;
-            margin-top: 0.125rem;
-        }
-        .password-match-msg.match { color: #10b981; }
-        .password-match-msg.no-match { color: #ef4444; }
+        .password-strength-text.medium { color: #d97706; }
+        .password-strength-text.strong { color: #059669; }
+        .password-match-msg { display: block; margin-top: .45rem; font-size: .75rem; font-weight: 700; }
+        .password-match-msg.match { color: #059669; }
+        .password-match-msg.no-match { color: #e11d48; }
+        html.dark .password-strength { background: rgb(255 255 255 / .1); }
+        html.dark .password-toggle, html.dark .confirm-password-toggle { color: #94a3b8; }
 
-        {{-- Confirmation Modal --}}
-        .confirm-create-modal {
-            position: fixed;
-            inset: 0;
-            margin: auto;
-            width: min(36rem, calc(100% - 2rem));
-            max-height: calc(100vh - 2rem);
-            padding: 0;
-            border: 0;
-            border-radius: 0.75rem;
-            background: #1f2937;
-            box-shadow: 0 24px 60px rgb(0 0 0 / 0.25);
-        }
-        .confirm-create-modal::backdrop { background: rgb(0 0 0 / 0.55); }
-        .confirm-create-modal__content { padding: 1.5rem; }
-        .confirm-create-modal__header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 1rem;
-        }
-        .confirm-create-modal__title { margin: 0; font-size: 1.25rem; color: #fff; }
-        .confirm-create-modal__close {
-            border: 0; color: #6b7280; background: transparent;
-            cursor: pointer; font-size: 1.75rem; line-height: 1;
-        }
-        .confirm-create-modal__body {
-            max-height: 50vh;
-            overflow-y: auto;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
-        }
-        .confirm-create-modal__body::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
-        .confirm-create-modal__row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #374151;
-        }
-        .confirm-create-modal__label {
-            color: #9ca3af;
-            font-size: 0.8125rem;
-            font-weight: 500;
-        }
-        .confirm-create-modal__value {
-            color: #f9fafb;
-            font-size: 0.875rem;
-            text-align: right;
-            max-width: 60%;
-            word-break: break-word;
-        }
-        .confirm-create-modal__section-title {
-            color: #8fb0f5;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-top: 1rem;
-            margin-bottom: 0.25rem;
-        }
-        .confirm-create-modal__actions {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-            padding-top: 1rem;
-            margin-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-        .role-selector {
-            display: flex;
-            gap: 0.75rem;
-        }
-        .role-option {
-            flex: 1;
-            text-align: center;
-            padding: 0.75rem;
-            border: 2px solid #d1d5db;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #fff;
-        }
-        .role-option:hover {
-            border-color: #2f5fd0;
-        }
-        .role-option.selected {
-            border-color: #2f5fd0;
-            background: #f0f4fd;
-        }
-        .role-option input[type="radio"] {
-            display: none;
-        }
+        /* Role: segmented control (script toggles .selected on .role-option) */
+        .role-selector { display: flex; gap: .3rem; height: 2.875rem; padding: .3rem; border-radius: .9rem; background: #f2f5fb; }
+        .role-option { flex: 1; border-radius: .65rem; transition: background-color .15s, box-shadow .15s; }
+        .role-option:hover { background: rgb(255 255 255 / .7); }
+        .role-option input[type="radio"] { display: none; }
         .role-option label {
-            margin: 0;
-            font-weight: 500;
-            cursor: pointer;
-            display: block;
-            color: #455072;
+            display: flex; height: 100%; align-items: center; justify-content: center; gap: .45rem; margin: 0; cursor: pointer;
+            font-size: .875rem; font-weight: 600; color: rgb(22 36 79 / .6);
         }
-        .role-option.selected label {
-            color: #16244f;
+        .role-option label svg { width: 1rem; height: 1rem; flex: none; }
+        .role-option.selected { background-image: linear-gradient(180deg, rgb(255 255 255 / .14), rgb(255 255 255 / 0) 55%), linear-gradient(150deg, #3a52a0, #16244f 78%); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 6px 14px -6px rgb(22 36 79 / .6); }
+        .role-option.selected label { color: #fff; }
+        .role-option.selected label svg { color: #f4b301; }
+        html.dark .role-selector { background: rgb(255 255 255 / .05); }
+        html.dark .role-option:hover { background: rgb(255 255 255 / .06); }
+        html.dark .role-option label { color: #94a3b8; }
+        html.dark .role-option.selected label { color: #fff; }
+
+        #student-fields, #teacher-fields { display: none; }
+        #student-fields.active, #teacher-fields.active { display: block; animation: ca-reveal .25s ease; }
+        @keyframes ca-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        /* Buttons */
+        .btn-cancel {
+            display: inline-flex; min-height: 2.625rem; align-items: center; justify-content: center; padding: .625rem 1.25rem;
+            border: 1px solid #d5dcec; border-radius: .75rem; background: #fff; color: #455072; font-size: .875rem; font-weight: 600;
+            cursor: pointer; transition: background-color .15s, color .15s, border-color .15s;
         }
-        #student-fields, #teacher-fields {
-            display: none;
+        .btn-cancel:hover { background: #f0f4fd; border-color: #c9d6f5; color: #1e46a8; }
+        html.dark .btn-cancel { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+        html.dark .btn-cancel:hover { background: rgb(59 130 246 / .12); color: #fff; }
+
+        /* Review dialog (rows are built by the script) */
+        .confirm-create-modal {
+            position: fixed; inset: 0; margin: auto; width: min(36rem, calc(100% - 2rem)); max-height: calc(100vh - 2rem); padding: 0; overflow: hidden;
+            border: 1px solid #e3e8f4; border-radius: 1.25rem; background: #fff; box-shadow: 0 24px 60px -12px rgb(22 36 79 / .35);
         }
-        #student-fields.active, #teacher-fields.active {
-            display: block;
+        .confirm-create-modal::backdrop { background: rgb(22 36 79 / .45); backdrop-filter: blur(4px); }
+        .confirm-create-modal__content { padding: 0 1.5rem 1.5rem; }
+        .confirm-create-modal__header {
+            display: flex; align-items: center; justify-content: space-between; margin: 0 -1.5rem 1rem; padding: 1.05rem 1.5rem;
+            background-image: radial-gradient(rgb(255 255 255 / .10) 1px, transparent 1px), linear-gradient(158deg, #24386f, #16244f 58%, #0f1a38); background-size: 16px 16px, auto;
+            border-bottom: 2px solid #f4b301;
         }
-        .chart-center {
-            padding-top: 2rem;
-            padding-bottom: 1rem;
-            text-align: start;
-            max-width: 72rem;
-            margin: 0 auto 1rem auto;
-            width: 100%;
-        }
+        .confirm-create-modal__title { margin: 0; font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: 1.125rem; font-weight: 700; color: #fff; }
+        .confirm-create-modal__close { display: flex; height: 2rem; width: 2rem; align-items: center; justify-content: center; border: 0; border-radius: 9999px; background: rgb(255 255 255 / .1); color: #fff; font-size: 1.4rem; line-height: 1; cursor: pointer; }
+        .confirm-create-modal__close:hover { background: rgb(255 255 255 / .2); }
+        .confirm-create-modal__body { max-height: 50vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .confirm-create-modal__body::-webkit-scrollbar { display: none; }
+        .confirm-create-modal__row { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem .25rem; border-bottom: 1px dashed #e3e8f4; }
+        .confirm-create-modal__label { color: #737c95; font-size: .8125rem; font-weight: 500; }
+        .confirm-create-modal__value { max-width: 60%; color: #16244f; font-size: .875rem; font-weight: 600; text-align: right; word-break: break-word; }
+        .confirm-create-modal__section-title { margin: 1rem 0 .25rem; color: #c85a08; font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+        .confirm-create-modal__actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eef1f8; }
+        html.dark .confirm-create-modal { background: #0f1a38; border-color: #24386f; }
+        html.dark .confirm-create-modal__actions { border-color: rgb(255 255 255 / .1); }
+        html.dark .confirm-create-modal__value { color: #fff; }
+        html.dark .confirm-create-modal__label { color: #94a3b8; }
+        html.dark .confirm-create-modal__row { border-color: rgb(255 255 255 / .1); }
+        html.dark .confirm-create-modal__section-title { color: #f4b301; }
     </style>
 @endsection
 
@@ -316,8 +146,9 @@
     <div class="create-form-container">
         <div class="flex items-center justify-between mb-4">
             <div class="chart-center">
-                <h1 class="text-2xl font-bold text-ink dark:text-white">Create Account</h1>
-                <p class="mt-1 text-sm text-ink/60 dark:text-gray-400">Create a new user account.</p>
+                <p class="ca-eyebrow">User Management</p>
+                <h1 class="mt-1 font-display text-[1.75rem] font-bold tracking-[-.5px] text-ink dark:text-white">Create Account</h1>
+                <p class="mt-1 text-sm text-ink/60 dark:text-gray-400">Create a new user account. You'll review every detail before it's saved.</p>
             </div>
             <!-- <a href="{{ route('admin.users.index') }}" class="btn-cancel">Back</a> -->
         </div>
@@ -360,7 +191,7 @@
                     <div class="form-group">
                         <label class="required" for="password">Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="password" name="password" required minlength="8" placeholder="Enter password">
+                            <input type="password" autocomplete="new-password" id="password" name="password" required minlength="8" placeholder="Enter password">
                             <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
                                 <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.522 3 12 3s8.268 4.943 9.542 9c-1.274 4.057-5.064 9-9.542 9S3.732 16.057 2.458 12z" /></svg>
                                 <svg class="w-5 h-5 eye-close" fill="none" stroke="currentColor" viewbox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l5.858 5.858M9.878 9.878L3 3m6.878 6.878L21 21" /></svg>
@@ -377,7 +208,7 @@
                     <div class="form-group">
                         <label class="required" for="password_confirmation">Confirm Password</label>
                         <div class="confirm-password-wrapper">
-                            <input type="password" id="password_confirmation" name="password_confirmation" required minlength="8" placeholder="Confirm password">
+                            <input type="password" autocomplete="new-password" id="password_confirmation" name="password_confirmation" required minlength="8" placeholder="Confirm password">
                             <button type="button" class="confirm-password-toggle" id="confirmPasswordToggle" aria-label="Toggle confirm password visibility">
                                 <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.522 3 12 3s8.268 4.943 9.542 9c-1.274 4.057-5.064 9-9.542 9S3.732 16.057 2.458 12z" /></svg>
                                 <svg class="w-5 h-5 eye-close" fill="none" stroke="currentColor" viewbox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l5.858 5.858M9.878 9.878L3 3m6.878 6.878L21 21" /></svg>
@@ -393,15 +224,15 @@
                         <div class="role-selector">
                             <div class="role-option {{ old('role') === 'Student' ? 'selected' : '' }}" id="role-option-student">
                                 <input type="radio" id="role_student" name="role" value="Student" {{ old('role') === 'Student' ? 'checked' : '' }}>
-                                <label for="role_student">Student</label>
+                                <label for="role_student"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5Zm0 0 6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14Z"/></svg>Student</label>
                             </div>
                             <div class="role-option {{ old('role') === 'Teacher' ? 'selected' : '' }}" id="role-option-teacher">
                                 <input type="radio" id="role_teacher" name="role" value="Teacher" {{ old('role') === 'Teacher' ? 'checked' : '' }}>
-                                <label for="role_teacher">Teacher</label>
+                                <label for="role_teacher"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>Teacher</label>
                             </div>
                             <div class="role-option {{ in_array(old('role'), ['Admin','Staff','Registrar','Accounting']) ? 'selected' : '' }}" id="role-option-admin">
                                 <input type="radio" id="role_admin" name="role" value="Admin" {{ old('role') === 'Admin' ? 'checked' : '' }}>
-                                <label for="role_admin">Admin</label>
+                                <label for="role_admin"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016Z"/></svg>Admin</label>
                             </div>
                         </div>
                         @error('role')

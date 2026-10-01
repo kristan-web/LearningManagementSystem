@@ -20,7 +20,7 @@
                     <tr>
                         <td align="center" style="padding:0 0 24px;">
                             @if ($logo)
-                                <img src="{{ $logo }}" alt="Enrollment Management System" width="112" style="display:block;width:112px;height:auto;border:0;outline:none;">
+                                <img src="{{ $logo }}" alt="Enrollment Management System" width="136" height="136" style="display:block;width:136px;height:136px;border:0;outline:none;">
                             @else
                                 {{-- Text wordmark when no public logo URL is configured (images on localhost can't load in inboxes) --}}
                                 <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:30px;line-height:36px;font-weight:700;letter-spacing:.5px;color:#16244f;">&#10022;&nbsp;LMS</span>
