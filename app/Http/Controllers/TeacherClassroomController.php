@@ -28,8 +28,7 @@ class TeacherClassroomController extends Controller
 {
     public function classes(Request $request): View
     {
-        $this->authorize('viewAny', Schedule::class);
-        $teacher = $request->user()->teacher;
+        $teacher = $this->authorizedTeacher($request);
         $schedules = $this->schedulesFor($teacher);
 
         $studentCounts = Enrollment::whereIn('section_id', $schedules->pluck('section_id')->unique())
@@ -292,6 +291,13 @@ class TeacherClassroomController extends Controller
             ->firstOrFail();
 
         return $data;
+    }
+
+    private function authorizedTeacher(Request $request): Teacher
+    {
+        abort_unless($request->user()->role === 'Teacher', 403);
+
+        return Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
     }
 
     /** The teacher's classes (one per schedule row), in timetable order. */
