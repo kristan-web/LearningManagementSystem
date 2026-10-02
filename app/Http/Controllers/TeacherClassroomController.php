@@ -11,6 +11,7 @@ use App\Models\LearningMaterial;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\Schedule;
+use App\Models\ScheduleEvent;
 use App\Models\Submission;
 use App\Models\Teacher;
 use Illuminate\Http\RedirectResponse;
@@ -39,12 +40,21 @@ class TeacherClassroomController extends Controller
             ->selectRaw('schedule_id, COUNT(*) as total')->groupBy('schedule_id')
             ->pluck('total', 'schedule_id');
 
+        // One active (not-yet-ended) meeting per schedule, if any — powers the Start/Join/End buttons on the class card.
+        $meetings = ScheduleEvent::where('event_type', 'Meeting')
+            ->whereIn('schedule_id', $schedules->pluck('schedule_id'))
+            ->where('meeting_status', '!=', 'Ended')
+            ->orderBy('start_datetime')
+            ->get()
+            ->keyBy('schedule_id');
+
         $classes = $schedules->map(fn (Schedule $s) => (object) [
             'schedule' => $s,
             'students' => (int) ($studentCounts[$s->section_id] ?? 0),
             'assignments' => $s->assignments_count,
             'quizzes' => $s->quizzes_count,
             'materials' => (int) ($materialCounts[$s->schedule_id] ?? 0),
+            'meeting' => $meetings->get($s->schedule_id),
         ]);
 
         return view('teacher.classes.index', compact('classes'));

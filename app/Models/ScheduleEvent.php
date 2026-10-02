@@ -14,8 +14,9 @@ class ScheduleEvent extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'created_by_role', 'created_by_id', 'section_id', 'subject_id',
+        'created_by_role', 'created_by_id', 'section_id', 'subject_id', 'schedule_id',
         'title', 'description', 'event_type', 'start_datetime', 'end_datetime', 'status',
+        'meeting_link', 'meeting_provider', 'meeting_status',
     ];
 
     protected $casts = [
@@ -32,6 +33,17 @@ class ScheduleEvent extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function schedule()
+    {
+        return $this->belongsTo(Schedule::class, 'schedule_id');
+    }
+
+    /** A Meeting event is "live" once a teacher has started it and hasn't ended it yet. */
+    public function isLive(): bool
+    {
+        return $this->event_type === 'Meeting' && $this->meeting_status === 'Live';
     }
 
     /**

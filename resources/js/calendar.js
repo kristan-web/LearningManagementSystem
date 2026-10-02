@@ -35,6 +35,11 @@ window.initLmsCalendar = function initLmsCalendar(el, { eventsUrl, onDateSelect,
             calendar.unselect();
         },
         eventClick(info) {
+            const link = info.event.extendedProps.meeting_link;
+            if (link) {
+                window.open(link, '_blank', 'noopener');
+                return;
+            }
             onEventClick(info);
         },
     });

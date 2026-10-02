@@ -160,7 +160,11 @@
                                     <p class="truncate text-sm font-semibold text-ink dark:text-white">{{ $event->title }}</p>
                                     <p class="text-xs text-ink/60 dark:text-slate-400">{{ $event->start_datetime->format('D, g:i A') }}</p>
                                 </div>
-                                <span class="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-semibold text-gold-deep dark:bg-gold/10 dark:text-gold">{{ $event->event_type }}</span>
+                                @if ($event->event_type === 'Meeting' && $event->meeting_link)
+                                    <a href="{{ $event->meeting_link }}" target="_blank" rel="noopener" class="shrink-0 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-emerald-700">Join</a>
+                                @else
+                                    <span class="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-semibold text-gold-deep dark:bg-gold/10 dark:text-gold">{{ $event->event_type }}</span>
+                                @endif
                             </li>
                         @endforeach
                     </ul>

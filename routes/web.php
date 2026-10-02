@@ -28,6 +28,7 @@ use App\Http\Controllers\TeacherClassroomController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\TeacherGradeController;
 use App\Http\Controllers\TeacherMaterialController;
+use App\Http\Controllers\TeacherMeetingController;
 use App\Http\Controllers\TeacherQuizController;
 use App\Http\Controllers\TeacherQuizReviewController;
 use App\Http\Controllers\TeacherScheduleController;
@@ -132,6 +133,10 @@ Route::middleware('auth')->group(function () {
 		Route::get('/teacher/grades', [TeacherClassroomController::class, 'grades'])->name('teacher.grades.index');
 		Route::get('/teacher/attendance', [TeacherClassroomController::class, 'attendance'])->name('teacher.attendance.index');
 		Route::post('/teacher/attendance', [TeacherClassroomController::class, 'saveAttendance'])->name('teacher.attendance.store');
+		Route::post('/teacher/meetings', [TeacherMeetingController::class, 'store'])->name('teacher.meetings.store');
+		Route::post('/teacher/meetings/instant', [TeacherMeetingController::class, 'instant'])->name('teacher.meetings.instant');
+		Route::put('/teacher/meetings/{event}/end', [TeacherMeetingController::class, 'end'])->name('teacher.meetings.end');
+		Route::delete('/teacher/meetings/{event}', [TeacherMeetingController::class, 'destroy'])->name('teacher.meetings.destroy');
 		Route::get('/teacher/communication', [MessageController::class, 'index'])->name('teacher.communication.index');
 		Route::view('/teacher/documentation', 'teacher.help.documentation')->name('teacher.documentation');
 		Route::view('/teacher/support', 'teacher.help.support')->name('teacher.support');

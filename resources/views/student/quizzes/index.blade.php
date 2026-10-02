@@ -80,23 +80,16 @@
                                     </td>
                                     <td class="px-3 py-2.5 text-right">
                                         @if ($active && ! $quiz->isPastDue())
-                                            <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 transition hover:bg-amber-500 hover:text-white dark:bg-amber-500/10 dark:text-amber-300">Resume</a>
-                                        @elseif ($canAttempt && ! $quiz->isPastDue())
-                                            <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 transition hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-300">{{ $used > 0 ? 'Retake' : 'Start' }}</a>
-                                        @elseif ($best)
-                                            <a href="{{ route('student.quizzes.results', [$quiz->quiz_id, $best->attempt_id]) }}" class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">Review</a>
-                                        @elseif ($quiz->isPastDue())
-                                            <span class="text-xs font-medium text-red-500 dark:text-red-400">Deadline passed</span>
-                                    <td class="text-right">
-                                        @if ($active)
                                             <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="inline-flex items-center rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-500/20 transition hover:bg-amber-500 hover:text-white dark:text-amber-300">Resume</a>
-                                        @elseif ($canAttempt)
+                                        @elseif ($canAttempt && ! $quiz->isPastDue())
                                             <a href="{{ route('student.quizzes.take', $quiz->quiz_id) }}" class="btn-navy btn-sm"
                                                data-confirm="{{ $used > 0 ? 'Retake' : 'Start' }} {{ $quiz->title }}?"
                                                data-confirm-text="This uses attempt {{ $used + 1 }} of {{ $quiz->attempts_allowed }}.{{ $quiz->time_limit_minutes ? ' The ' . $quiz->time_limit_minutes . '-minute timer starts right away.' : '' }}"
                                                data-confirm-button="{{ $used > 0 ? 'Retake quiz' : 'Start quiz' }}">{{ $used > 0 ? 'Retake' : 'Start' }}</a>
                                         @elseif ($best)
                                             <a href="{{ route('student.quizzes.results', [$quiz->quiz_id, $best->attempt_id]) }}" class="st-btn-outline btn-sm">Review</a>
+                                        @elseif ($quiz->isPastDue())
+                                            <span class="text-xs font-medium text-red-500 dark:text-red-400">Deadline passed</span>
                                         @else
                                             <span class="text-xs text-ink/50 dark:text-slate-500">No attempts left</span>
                                         @endif

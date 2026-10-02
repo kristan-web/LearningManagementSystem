@@ -32,12 +32,14 @@ class CalendarEventService
                 'title' => $event->title,
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
-                'classNames' => ['fc-event--personal'],
+                'classNames' => [$event->event_type === 'Meeting' ? 'fc-event--meeting' : 'fc-event--personal'],
                 'extendedProps' => [
                     'source' => 'event',
                     'subject_name' => $event->subject?->subject_name,
                     'description' => $event->description,
                     'editable' => $event->created_by_role === 'Student' && $event->created_by_id === $student->student_id,
+                    'meeting_link' => $event->meeting_link,
+                    'meeting_status' => $event->meeting_status,
                 ],
             ]);
 
@@ -100,12 +102,14 @@ class CalendarEventService
                 'title' => $event->title,
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
-                'classNames' => ['fc-event--personal'],
+                'classNames' => [$event->event_type === 'Meeting' ? 'fc-event--meeting' : 'fc-event--personal'],
                 'extendedProps' => [
                     'source' => 'event',
                     'subject_name' => $event->subject?->subject_name,
                     'description' => $event->description,
                     'editable' => $event->created_by_role === 'Teacher' && $event->created_by_id === $teacherId,
+                    'meeting_link' => $event->meeting_link,
+                    'meeting_status' => $event->meeting_status,
                 ],
             ]);
 
@@ -161,7 +165,7 @@ class CalendarEventService
                 'title' => $event->title,
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
-                'classNames' => ['fc-event--admin'], // New class for admin events
+                'classNames' => [$event->event_type === 'Meeting' ? 'fc-event--meeting' : 'fc-event--admin'],
                 'extendedProps' => [
                     'source' => 'event',
                     'subject_name' => $event->subject?->subject_name,
@@ -171,6 +175,8 @@ class CalendarEventService
                     'created_by_id' => $event->created_by_id,
                     'section_id' => $event->section_id,
                     'subject_id' => $event->subject_id,
+                    'meeting_link' => $event->meeting_link,
+                    'meeting_status' => $event->meeting_status,
                 ],
             ]);
     }
