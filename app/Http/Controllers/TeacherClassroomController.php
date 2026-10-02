@@ -26,6 +26,12 @@ use Illuminate\View\View;
 /** Teacher pages built on the teacher's own schedules: My Classes, Grades & Records, Attendance. */
 class TeacherClassroomController extends Controller
 {
+    private function authorizedTeacher(Request $request): \App\Models\Teacher
+    {
+        abort_unless($request->user()->role === 'Teacher', 403);
+        return $request->user()->teacher;
+    }
+
     public function classes(Request $request): View
     {
         $teacher = $this->authorizedTeacher($request);
@@ -42,7 +48,7 @@ class TeacherClassroomController extends Controller
         // One active (not-yet-ended) meeting per schedule, if any — powers the Start/Join/End buttons on the class card.
         $meetings = ScheduleEvent::where('event_type', 'Meeting')
             ->whereIn('schedule_id', $schedules->pluck('schedule_id'))
-            ->where('meeting_status', '!=', 'Ended')
+            ->where('status', '!=', 'Ended')
             ->orderBy('start_datetime')
             ->get()
             ->keyBy('schedule_id');
