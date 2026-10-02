@@ -16,16 +16,16 @@ class TeacherGradeController extends Controller
 {
     public function show(Request $request, Student $student): View
     {
-        $teacher = $this->authorizedTeacher($request);
-        $sectionIds = $this->teacherSectionIds($teacher);
+        $this->authorize('view', $student);
+        $teacher = $request->user()->teacher;
 
         $enrollment = Enrollment::where('student_id', $student->student_id)
-            ->whereIn('section_id', $sectionIds)
             ->where('status', 'Enrolled')
             ->with('section.strand')
             ->first();
 
-        abort_unless($enrollment !== null, 403);
+        // The policy ensures the teacher teaches this student, so enrollment should exist
+        abort_if($enrollment === null, 404);
 
         $student->load('user');
 
@@ -73,22 +73,5 @@ class TeacherGradeController extends Controller
         return $values->isEmpty() ? null : round($values->avg(), 2);
     }
 
-    private function authorizedTeacher(Request $request): Teacher
-    {
-        abort_unless($request->user()->role === 'Teacher', 403);
-
-        return Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
-    }
-
-    /**
-     * A teacher's sections aren't a direct relation — they're whichever
-     * class_sections appear on the teacher's own schedule rows. Mirrors
-     * TeacherClassController::teacherSectionIds().
-     */
-    private function teacherSectionIds(Teacher $teacher): Collection
-    {
-        return Schedule::where('teacher_id', $teacher->teacher_id)
-            ->distinct()
-            ->pluck('section_id');
-    }
+    //
 }

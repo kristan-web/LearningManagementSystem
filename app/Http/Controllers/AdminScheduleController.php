@@ -7,17 +7,19 @@ use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\Subject;
 use App\Models\Teacher;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminScheduleController extends Controller
 {
+    use AuthorizesRequests;
     private const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
     public function index(Request $request): View
     {
-        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $this->authorize('viewAny', Schedule::class);
 
         $schedules = Schedule::with(['section.strand','subject','teacher.user','room'])
             ->get()->sortBy(fn(Schedule $s)=>[
@@ -34,7 +36,7 @@ class AdminScheduleController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $this->authorize('create', Schedule::class);
         $data = $this->validateSchedule($request);
         if ($conflict = $this->detectConflict($data)) return back()->withErrors(['conflict'=>$conflict])->withInput();
         Schedule::create($data);
@@ -43,8 +45,9 @@ class AdminScheduleController extends Controller
 
     public function update(Request $request, int $schedule_id): RedirectResponse
     {
-        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $this->authorize('create', Schedule::class);
         $schedule = Schedule::findOrFail($schedule_id);
+        $this->authorize('update', $schedule);
         $data = $this->validateSchedule($request);
         if ($conflict = $this->detectConflict($data, $schedule->schedule_id)) return back()->withErrors(['conflict'=>$conflict])->withInput();
         $schedule->update($data);
@@ -53,8 +56,9 @@ class AdminScheduleController extends Controller
 
     public function destroy(Request $request, int $schedule_id): RedirectResponse
     {
-        abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $this->authorize('create', Schedule::class);
         $schedule = Schedule::findOrFail($schedule_id);
+        $this->authorize('delete', $schedule);
         $linked = $schedule->assignments()->count() + $schedule->quizzes()->count();
         if ($linked > 0) return back()->withErrors(['conflict'=>"This schedule period has {$linked} linked assignment(s)/quiz(zes) and cannot be deleted."]);
         $schedule->delete();
