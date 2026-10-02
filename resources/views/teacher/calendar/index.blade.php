@@ -33,6 +33,12 @@
             --fc-neutral-text-color: #cbd5e1;    /* slate-300 */
             --fc-today-bg-color: rgb(37 99 235 / 0.15); /* blue-600 tint */
         }
+        /* Meeting events (Google Meet links) stand out in green and open the link on click. */
+        .fc-event--meeting {
+            background-color: #16a34a !important;
+            border-color: #16a34a !important;
+            cursor: pointer;
+        }
     </style>
 @endsection
 
