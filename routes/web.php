@@ -17,6 +17,8 @@ use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentGradeController;
+use App\Http\Controllers\ReportCardController;
+
 use App\Http\Controllers\StudentMaterialController;
 use App\Http\Controllers\StudentQuizController;
 use App\Http\Controllers\StudentScheduleController;
@@ -154,6 +156,8 @@ Route::middleware('auth')->group(function () {
 		Route::get('/student/attendance', [StudentAttendanceController::class, 'index'])->name('student.attendance.index');
 		Route::get('/student/communication', [MessageController::class, 'index'])->name('student.communication.index');
 		Route::get('/student/grades', [StudentGradeController::class, 'index'])->name('student.grades.index');
+		Route::get('/student/grades/report-card/{student}', [ReportCardController::class, 'generate'])->name('student.grades.report-card');
+
 		// UI-only student page: swap Route::view for a controller once this module has data.
 		Route::view('/student/enrollment', 'student.enrollment.index')->name('student.enrollment.index');
 		Route::view('/student/documentation', 'student.help.documentation')->name('student.documentation');
