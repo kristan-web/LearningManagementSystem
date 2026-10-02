@@ -5,9 +5,131 @@ manual static read-through of routes, middleware, and controllers most likely
 to hide authorization/logic bugs. Tests run against an in-memory SQLite DB
 (see `phpunit.xml`), so this was non-destructive to the real `enrollment_management_system` database.
 
-**Result: 137 passed, 3 failed (411 assertions, ~11s).**
+**Result when first found: 134 passed, 19 failed (453 assertions).**
+**Result after all fixes below: 142 passed, 0 failed (464 assertions).**
+
+> Previous run of this report (3 failed) undercounted the real failures. A
+> rescan found a second, larger class of bugs below (sections 0a/0b/0c) — two
+> whole teacher features (`TeacherClassController`, `TeacherGradeController`,
+> `TeacherAttendanceController`) were superseded by a newer
+> `TeacherClassroomController` without removing the old routes or the old
+> half of the blade views, leaving dead code, shadowed routes, and
+> `Undefined variable` crashes. Numbering below keeps the original 3 findings
+> as-is and adds the new ones as `0a`/`0b`/`0c` so existing references to
+> "finding 1/2/3" still resolve.
+>
+> **All findings in this report (0a, 0b, 0c, 1, 2, 3) have been fixed.** See
+> the "Fix applied" note at the end of each section for what changed.
 
 ---
+
+## 0a. Real app bug: duplicate route registrations shadow three teacher features
+
+- **File:** `routes/web.php`, lines 90, 115, 119-122, 134-135.
+- **Symptom:** `TeacherClassTest`, `TeacherGradeTest`, and part of
+  `TeacherAttendanceTest`/`TeacherClassroomTest` fail with 500 errors
+  (`Undefined variable $stats`) or wrong assertions. 13 of the 19 failing
+  tests trace back to this (together with 0b).
+- **Root cause:** The same three paths are registered twice, under the same
+  route **names**, pointing at two different controllers:
+  - `GET /teacher/classes` — line 90 (`TeacherClassController@index`) vs.
+    line 119 (`TeacherClassroomController@classes`), both named
+    `teacher.classes.index`.
+  - `GET /teacher/grades` — line 115 (`TeacherGradeController@index`) vs.
+    line 120 (`TeacherClassroomController@grades`), both named
+    `teacher.grades.index`.
+  - `GET /teacher/attendance` — line 121 (`TeacherClassroomController@attendance`)
+    vs. line 134 (`TeacherAttendanceController@index`), both named
+    `teacher.attendance.index`.
+  - `POST /teacher/attendance` — line 122 (`TeacherClassroomController@saveAttendance`)
+    vs. line 135 (`TeacherAttendanceController@store`), both named
+    `teacher.attendance.store`.
+
+  Laravel's router matches whichever matching route was **registered last**
+  for a given method+URI, so the earlier controller in each pair
+  (`TeacherClassController::index`, `TeacherGradeController::index`,
+  `TeacherAttendanceController::index`/`store`) is completely unreachable —
+  confirmed with `php artisan route:list --path=teacher/classes` (etc.),
+  which shows only one route per path/method, always resolving to
+  `TeacherClassroomController`.
+- **Why it matters:** two full controllers' worth of code
+  (`TeacherClassController::index`, `TeacherGradeController::index`,
+  `TeacherAttendanceController::index`/`store`) are dead — no request can
+  ever reach them — while their test suites still assert against the routes,
+  and the blade views they render still contain markup expecting their view
+  variables (see 0b), which is what actually throws.
+- **Suggested fix:** delete the shadowed route lines (90 old-only use;
+  115; 134-135), keeping only the `TeacherClassroomController` routes plus
+  `TeacherClassController::store` (`/teacher/classes` POST, still the live
+  "Add Student" handler) and `TeacherGradeController::show`
+  (`/teacher/grades/{student}`, a distinct path that isn't shadowed). Then
+  delete the now-unreachable controller methods and retire/rewrite the tests
+  that exercised them in favor of the equivalent coverage already in
+  `TeacherClassroomTest.php`.
+- **Fix applied:** removed the 4 shadowed route lines from `routes/web.php`;
+  deleted the dead `index()` methods from `TeacherClassController` and
+  `TeacherGradeController` (and their now-unused private helpers/imports);
+  deleted `TeacherAttendanceController` entirely (both its routes were
+  shadowed, nothing of it survived); deleted `TeacherAttendanceTest.php` and
+  trimmed `TeacherClassTest.php`/`TeacherGradeTest.php` to only cover the
+  routes those controllers still serve (`store`/`show`).
+
+## 0b. Real app bug: leftover dead markup in teacher blade views throws `Undefined variable`
+
+- **File:** `resources/views/teacher/classes/index.blade.php` (two
+  `@section('content')` blocks: lines 32-237 and 248-315),
+  `resources/views/teacher/grades/index.blade.php` (lines 20-133 and
+  143-329), `resources/views/teacher/attendance/index.blade.php` (lines
+  26-134 and 149-275).
+- **Symptom:** `Undefined variable $stats` thrown from
+  `teacher/grades/index.blade.php` (and the same class of error in the other
+  two views) when `TeacherClassroomController` renders them — reproduced by
+  `TeacherGradeTest::test_teacher_does_not_see_grades_for_students_outside_their_sections`.
+- **Root cause:** each file still contains the **old** UI's full
+  `@section('content') ... @endsection` block (written for
+  `TeacherClassController`/`TeacherGradeController`/`TeacherAttendanceController`,
+  using `$sections`, `$students`, `$stats`, `$enrollments`) immediately
+  followed by the **new** UI's block (written for
+  `TeacherClassroomController`, using `$classes`, `$schedules`, `$selected`,
+  `$summary`). Blade lets a later `@section` of the same name silently
+  overwrite an earlier one for rendering, but the whole file is still
+  compiled and executed top-to-bottom, so the first (dead) block's
+  references to `$stats` etc. throw before the second block ever runs,
+  whenever the data comes from `TeacherClassroomController` instead.
+- **Suggested fix:** delete the first, dead `@section('content')` block in
+  each of the three files, keeping only the block that matches the variables
+  `TeacherClassroomController` actually passes to the view.
+- **Fix applied:** deleted the dead first `@section('content')` block (plus
+  its matching dead `@php` header) from all three views. In
+  `teacher/classes/index.blade.php` the dead block also contained the only
+  working "Add Student" modal (posting to the still-live
+  `teacher.classes.store` route); since `TeacherClassroomController::classes()`
+  doesn't pass the modal's dependencies (`$schoolYears`, `$allStudents`,
+  etc.), it was removed rather than rewired — left a `ponytail:` comment in
+  the view noting the modal needs its own page/data if that feature returns.
+
+## 0c. Test bugs: stale `student/assignments` blade bugs re-surface through unrelated tests
+
+- **File:** `resources/views/student/assignments/index.blade.php` (unclosed
+  `@forelse`), `resources/views/student/assignments/show.blade.php` (orphaned
+  `@elseif`).
+- **Symptom:** `AssignmentLoopTest::test_submission_and_grading_loop` and
+  both `AssignmentDiscussionTest` methods fail with 500s on
+  `GET /student/assignments` / `GET /student/assignments/{assignment}`.
+- **Root cause:** the Blade syntax errors in these two views (unclosed
+  `@forelse` / orphaned `@elseif`) break compilation for *any* test that
+  happens to hit those routes, not just tests that target the assignments
+  feature directly — confirming these are real, previously-identified
+  template bugs rather than isolated to one test file.
+- **Suggested fix:** close the `@forelse` properly in `index.blade.php` and
+  remove or correctly pair the orphaned `@elseif` in `show.blade.php`.
+- **Fix applied:** `index.blade.php` had the same "old UI left behind"
+  pattern as 0b — a second, fully-formed `@forelse`/`@empty`/`@endforelse`
+  table was nested inside the first (unclosed) `@forelse`'s `@empty` branch.
+  Deleted the dead inner table, keeping the outer one and giving it its own
+  proper `@empty` row. In `show.blade.php`, wrapped the orphaned
+  `@elseif ($assignment->isPastDue())` branch in the `@if ($submission)`
+  condition it was clearly meant to pair with.
 
 ## 1. Real app bug: wrong HTTP status for unauthorized schedule PUT/DELETE
 
@@ -40,6 +162,11 @@ to hide authorization/logic bugs. Tests run against an in-memory SQLite DB
   middleware to the `/admin/schedule/*` route group so the check runs before
   binding. Either fixes all three verbs identically — no need to special-case
   PUT vs DELETE.
+- **Fix applied:** changed `update()`/`destroy()` in `AdminScheduleController`
+  to take `int $schedule_id` and call `Schedule::findOrFail($schedule_id)`
+  right after the `abort_unless` role check (matching `SubjectController`'s
+  pattern), instead of type-hinting `Schedule $schedule` for implicit
+  route-model binding.
 
 ## 2. Real app bug: unreachable dead code + wrong request type in `CalendarController::events()`
 
@@ -57,6 +184,9 @@ to hide authorization/logic bugs. Tests run against an in-memory SQLite DB
   from the Teacher check straight to
   `return response()->json($this->calendar->feedFor($student, $from, $to));`
   with `$student` resolved right before that line, as it was likely intended.
+- **Fix applied:** deleted the unreachable `if ($request->user()->role ===
+  'Admin')` block (lines 62-72); `events()` now falls through from the
+  `$student = ...` lookup straight to the `feedFor()` call.
 
 ## 3. Test bugs (not app bugs) — two schedule-conflict tests reuse one section
 
@@ -77,6 +207,11 @@ to hide authorization/logic bugs. Tests run against an in-memory SQLite DB
 - **Suggested fix:** in both tests, create two separate sections (e.g. using
   the existing `makeSection()` helper twice) so the section check doesn't
   trigger before the room/teacher check the test is actually targeting.
+- **Fix applied:** both tests now create two sections (and, for the teacher
+  conflict test, two rooms) and build the conflicting schedule/payload using
+  the *other* section/room than the one in the original schedule, so only
+  the conflict dimension under test (room, teacher) can fire — the section
+  check no longer has anything to object to.
 
 ## 4. Minor / non-blocking
 
@@ -99,7 +234,9 @@ to hide authorization/logic bugs. Tests run against an in-memory SQLite DB
 This pass focused on the failing tests plus a read-through of
 auth/middleware-adjacent controllers (`AdminScheduleController`,
 `CalendarController`, `SubjectController`, `EnrollmentController`,
-`TeacherMaterialController`, `ProfileController`, `WebAuthController`). The
-remaining controllers (grading, quizzes, attendance, announcements, reports,
-notifications) passed their existing tests and weren't manually audited line
-by line. Flagging in case a deeper audit of those modules is wanted next.
+`TeacherMaterialController`, `ProfileController`, `WebAuthController`), plus
+(in the rescan) the teacher classes/grades/attendance route+controller+view
+trio (0a/0b) and the student assignments views (0c). Quizzes, announcements,
+reports, and notifications passed their existing tests and weren't manually
+audited line by line. Flagging in case a deeper audit of those modules is
+wanted next.

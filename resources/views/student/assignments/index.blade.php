@@ -92,74 +92,14 @@
                             </td>
                         </tr>
                     @empty
-            <div class="st-table-wrap mt-3">
-                <table class="st-table">
-                    <thead>
                         <tr>
-                            <th>Assignment</th>
-                            <th>Subject</th>
-                            <th>Due</th>
-                            <th>Status</th>
-                            <th>Score</th>
-                            <th class="text-right">Submit</th>
+                            <td colspan="6" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                No assignments yet. Check back when your teachers post new work.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($assignments as $assignment)
-                            @php $submission = $firstSubmission($assignment); @endphp
-                            <tr>
-                                <td>
-                                    <a href="{{ route('student.assignments.show', $assignment->assignment_id) }}" class="font-semibold text-ink hover:text-brand hover:underline dark:text-white">{{ $assignment->title }}</a>
-                                    @if ($assignment->instructions)
-                                        <p class="mt-0.5 line-clamp-2 text-xs text-ink/55 dark:text-slate-400">{{ $assignment->instructions }}</p>
-                                    @endif
-                                </td>
-                                <td>{{ $assignment->schedule?->subject?->subject_name }}</td>
-                                <td class="whitespace-nowrap">
-                                    {{ $assignment->due_date?->format('M d, Y') }}<br>
-                                    <span class="text-xs text-ink/50 dark:text-slate-500">{{ $assignment->due_date?->format('h:i A') }}</span>
-                                </td>
-                                <td>
-                                    @if ($submission)
-                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $statusBadge[$submission->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }}">
-                                            {{ $submission->status }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">Not submitted</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($submission?->score !== null)
-                                        <span class="font-semibold text-ink dark:text-white">{{ $submission->score }}</span>
-                                        <span class="text-ink/50 dark:text-slate-500">/ {{ $assignment->max_score }}</span>
-                                    @else
-                                        <span class="text-ink/40 dark:text-slate-500">&mdash;</span>
-                                    @endif
-                                </td>
-                                <td class="text-right">
-                                    @if ($submission)
-                                        <span class="text-xs text-ink/50 dark:text-slate-500">Submitted {{ $submission->submitted_at?->format('M d, Y') }}</span>
-                                    @else
-                                        <form method="POST" action="{{ route('student.assignments.submit', $assignment->assignment_id) }}"
-                                              enctype="multipart/form-data" class="inline-flex items-center gap-2"
-                                              data-confirm="Submit this assignment?" data-confirm-text="You can only submit once, so make sure you picked the right file." data-confirm-button="Yes, submit">
-                                            @csrf
-                                            <input type="file" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip" class="st-file max-w-48">
-                                            <button type="submit" class="btn-navy btn-sm">Submit</button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="st-table__empty">
-                                    No assignments yet. Check back when your teachers post new work.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @endforelse
+                </tbody>
+            </table>
         </article>
     </div>
 </div>

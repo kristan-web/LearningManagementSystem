@@ -19,7 +19,8 @@ class TeacherQuizController extends Controller
 
     public function index(Request $request): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('viewAny', Quiz::class);
+        $teacher = $request->user()->teacher;
 
         $query = Quiz::forTeacher($teacher->teacher_id)
             ->with(['schedule.subject', 'schedule.section'])
@@ -43,7 +44,8 @@ class TeacherQuizController extends Controller
 
     public function create(Request $request): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('create', Quiz::class);
+        $teacher = $request->user()->teacher;
         $schedules = Schedule::where('teacher_id', $teacher->teacher_id)
             ->with(['subject', 'section'])
             ->orderBy('schedule_id')
@@ -54,20 +56,8 @@ class TeacherQuizController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-
-        $data = $request->validate([
-            'schedule_id' => ['required', 'integer'],
-            'title' => ['required', 'string', 'max:255'],
-            'time_limit_minutes' => ['nullable', 'integer', 'min:1', 'max:600'],
-            'attempts_allowed' => ['required', 'integer', 'in:1,2'],
-            'due_date' => ['nullable', 'date'],
-            'csv_file' => ['required', 'file', 'max:2048', 'mimes:csv,txt'],
-        ]);
-
-        // exists:schedules,schedule_id isn't enough — the schedule must be this teacher's own.
-        $owns = Schedule::where('schedule_id', $data['schedule_id'])->where('teacher_id', $teacher->teacher_id)->exists();
-        abort_unless($owns, 403);
+        $this->authorize('create', Quiz::class);
+        $data = $this->validatedQuiz($request);
 
         $quiz = Quiz::create([
             'schedule_id' => $data['schedule_id'],
@@ -90,8 +80,7 @@ class TeacherQuizController extends Controller
 
     public function destroy(Request $request, Quiz $quiz): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-        $this->authorizeOwnership($quiz, $teacher->teacher_id);
+        $this->authorize('delete', $quiz);
 
         $quiz->delete();
 
@@ -101,8 +90,7 @@ class TeacherQuizController extends Controller
     /** Pushes a quiz's due date forward — re-opens attempts for students once it has passed. */
     public function extendDeadline(Request $request, Quiz $quiz): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-        $this->authorizeOwnership($quiz, $teacher->teacher_id);
+        $this->authorize('update', $quiz);
 
         // Quizzes may have no due date yet — fall back to "after now" so a first deadline can be set.
         $after = $quiz->due_date ?? now();
@@ -116,16 +104,24 @@ class TeacherQuizController extends Controller
         return redirect()->route('teacher.quizzes.index')->with('success', 'Deadline extended successfully.');
     }
 
-    private function authorizedTeacher(Request $request): Teacher
+    private function validatedQuiz(Request $request): array
     {
-        abort_unless($request->user()->role === 'Teacher', 403);
+        $data = $request->validate([
+            'schedule_id' => ['required', 'integer'],
+            'title' => ['required', 'string', 'max:255'],
+            'time_limit_minutes' => ['nullable', 'integer', 'min:1', 'max:600'],
+            'attempts_allowed' => ['required', 'integer', 'in:1,2'],
+            'due_date' => ['nullable', 'date'],
+            'csv_file' => ['required', 'file', 'max:2048', 'mimes:csv,txt'],
+        ]);
 
-        return Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
-    }
+        // Verify the teacher owns this schedule
+        $owns = \App\Models\Schedule::where('schedule_id', $data['schedule_id'])
+            ->where('teacher_id', $request->user()->teacher->teacher_id)
+            ->exists();
+        
+        abort_unless($owns, 403);
 
-    /** A teacher may only manage quizzes on their own schedules. */
-    private function authorizeOwnership(Quiz $quiz, int $teacherId): void
-    {
-        abort_unless($quiz->schedule?->teacher_id === $teacherId, 403);
+        return $data;
     }
 }

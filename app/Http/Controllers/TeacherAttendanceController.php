@@ -5,106 +5,95 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceRecord;
 use App\Models\Enrollment;
 use App\Models\Schedule;
-use App\Models\Teacher;
+use App\Models\Student;
+use App\Events\AttendanceRecorded;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 class TeacherAttendanceController extends Controller
 {
-    public function index(Request $request): View
+    /**
+     * Display the attendance entry form for a specific schedule.
+     */
+    public function index(Request $request, Schedule $schedule): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('update', $schedule); // Teacher can only take attendance for their own schedules
 
-        $schedules = Schedule::where('teacher_id', $teacher->teacher_id)
-            ->with(['subject', 'section'])
-            ->orderBy('schedule_id')
+        $today = Carbon::today()->toDateString();
+
+        // Get enrolled students for this schedule's section
+        $enrollments = Enrollment::where('section_id', $schedule->section_id)
+            ->where('status', 'Active')
+            ->with('student.user')
             ->get();
 
-        $selectedScheduleId = $request->filled('schedule_id')
-            ? (int) $request->input('schedule_id')
-            : $schedules->first()?->schedule_id;
+        // Get existing attendance records for today for this schedule
+        $existingRecords = AttendanceRecord::where('schedule_id', $schedule->schedule_id)
+            ->where('attendance_date', $today)
+            ->get()
+            ->keyBy('student_id');
 
-        $schedule = $schedules->firstWhere('schedule_id', $selectedScheduleId);
-        abort_if($selectedScheduleId !== null && $schedule === null, 403);
+        $students = $enrollments->map(function ($enrollment) use ($existingRecords) {
+            $student = $enrollment->student;
+            $record = $existingRecords->get($student->student_id);
 
-        $date = $request->filled('date') ? $request->input('date') : now()->toDateString();
+            return [
+                'student_id' => $student->student_id,
+                'student_name' => $student->user->name,
+                'lr_number' => $student->lr_number,
+                'current_status' => $record ? $record->status : null,
+                'remarks' => $record ? $record->remarks : '',
+            ];
+        });
 
-        $students = collect();
-
-        if ($schedule !== null) {
-            $existing = AttendanceRecord::where('schedule_id', $schedule->schedule_id)
-                ->where('attendance_date', $date)
-                ->get()
-                ->keyBy('student_id');
-
-            $students = Enrollment::where('section_id', $schedule->section_id)
-                ->where('status', 'Enrolled')
-                ->with('student.user')
-                ->orderBy('student_id')
-                ->get()
-                ->map(fn (Enrollment $enrollment) => [
-                    'student' => $enrollment->student,
-                    'status' => $existing->get($enrollment->student_id)?->status,
-                ]);
-        }
-
-        return view('teacher.attendance.index', compact('schedules', 'schedule', 'selectedScheduleId', 'date', 'students'));
+        return view('teacher.attendance.index', compact('schedule', 'students', 'today'));
     }
 
-    public function store(Request $request): RedirectResponse
+    /**
+     * Store batch attendance records for a schedule.
+     */
+    public function store(Request $request, Schedule $schedule): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-        $scheduleIds = Schedule::where('teacher_id', $teacher->teacher_id)->pluck('schedule_id');
+        $this->authorize('update', $schedule); // Teacher can only take attendance for their own schedules
 
-        $data = $request->validate([
-            'schedule_id' => ['required', 'integer', Rule::in($scheduleIds)],
-            'date' => ['required', 'date'],
-            'records' => ['required', 'array'],
-            'records.*.student_id' => ['required', 'integer'],
-            'records.*.status' => ['required', Rule::in(AttendanceRecord::STATUSES)],
-        ], [
-            'schedule_id.in' => 'You can only take attendance for a class you teach.',
+        $request->validate([
+            'attendance_date' => 'required|date',
+            'records' => 'required|array',
+            'records.*.student_id' => 'required|integer|exists:students,student_id',
+            'records.*.status' => 'required|in:Present,Late,Absent,Excused',
+            'records.*.remarks' => 'nullable|string|max:255',
         ]);
 
-        $schedule = Schedule::findOrFail($data['schedule_id']);
-        $enrolledStudentIds = Enrollment::where('section_id', $schedule->section_id)
-            ->where('status', 'Enrolled')
-            ->pluck('student_id');
+        $date = $request->input('attendance_date');
+        $records = $request->input('records');
 
-        DB::transaction(function () use ($data, $enrolledStudentIds, $request) {
-            foreach ($data['records'] as $record) {
-                if (! $enrolledStudentIds->contains($record['student_id'])) {
-                    continue;
-                }
-
-                AttendanceRecord::updateOrCreate(
+        DB::transaction(function () use ($schedule, $date, $records) {
+            foreach ($records as $recordData) {
+                $attendanceRecord = AttendanceRecord::updateOrCreate(
                     [
-                        'schedule_id' => $data['schedule_id'],
-                        'student_id' => $record['student_id'],
-                        'attendance_date' => $data['date'],
+                        'schedule_id' => $schedule->schedule_id,
+                        'student_id' => $recordData['student_id'],
+                        'attendance_date' => $date,
                     ],
                     [
-                        'status' => $record['status'],
-                        'logged_by' => $request->user()->user_id,
+                        'status' => $recordData['status'],
+                        'remarks' => $recordData['remarks'] ?? null,
+                        'logged_by' => $request->user()->teacher->teacher_id,
                         'logged_at' => now(),
-                    ],
+                    ]
                 );
+
+                // Fire event for each attendance record created/updated
+                event(new AttendanceRecorded($attendanceRecord));
             }
         });
 
-        return redirect()->route('teacher.attendance.index', [
-            'schedule_id' => $data['schedule_id'],
-            'date' => $data['date'],
-        ])->with('success', 'Attendance saved.');
-    }
-
-    private function authorizedTeacher(Request $request): Teacher
-    {
-        abort_unless($request->user()->role === 'Teacher', 403);
-
-        return Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
+        return redirect()
+            ->route('teacher.attendance.index', $schedule->schedule_id)
+            ->with('success', 'Attendance recorded successfully.');
     }
 }

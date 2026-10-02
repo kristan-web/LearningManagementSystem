@@ -164,15 +164,17 @@ class AdminScheduleTest extends TestCase
         $admin = $this->adminUser();
         [$user1, $teacher1] = $this->makeTeacher();
         [$user2, $teacher2] = $this->makeTeacher();
-        $section = $this->makeSection();
-        $subject = $this->makeSubject($section);
+        $section1 = $this->makeSection();
+        $section2 = $this->makeSection();
+        $subject = $this->makeSubject($section1);
         $room = $this->makeRoom();
 
         // Create first schedule
-        Schedule::create($this->payload($section, $subject, $teacher1, $room));
+        Schedule::create($this->payload($section1, $subject, $teacher1, $room));
 
-        // Try to create overlapping schedule for same room, different teacher
-        $payload = $this->payload($section, $subject, $teacher2, $room);
+        // Try to create overlapping schedule for same room, different teacher and section
+        // (different section so the section-conflict check doesn't short-circuit before the room check).
+        $payload = $this->payload($section2, $subject, $teacher2, $room);
 
         $response = $this->actingAs($admin)->post('/admin/schedule', $payload);
 
@@ -223,32 +225,39 @@ class AdminScheduleTest extends TestCase
         $admin = $this->adminUser();
         [$user, $teacher1] = $this->makeTeacher();
         [$user2, $teacher2] = $this->makeTeacher();
-        $section = $this->makeSection();
-        $subject = $this->makeSubject($section);
-        $room = $this->makeRoom();
+        $section1 = $this->makeSection();
+        $section2 = $this->makeSection();
+        $subject = $this->makeSubject($section1);
+        $room1 = $this->makeRoom();
+        $room2 = $this->makeRoom();
 
         // Create existing schedule for teacher2 on Monday 08:00-09:00
-        Schedule::create($this->payload($section, $subject, $teacher2, $room));
+        Schedule::create($this->payload($section1, $subject, $teacher2, $room1));
 
         // Create schedule for teacher1 that we'll try to update to conflict
         $schedule = Schedule::create([
-            'section_id'  => $section->section_id,
+            'section_id'  => $section2->section_id,
             'subject_id'  => $subject->subject_id,
             'teacher_id'  => $teacher1->teacher_id,
-            'room_id'     => $room->room_id,
+            'room_id'     => $room2->room_id,
             'day_of_week' => 'Tuesday',
             'start_time'  => '10:00:00',
             'end_time'    => '11:00:00',
         ]);
 
-        // Try to update to Monday 08:00-09:00 (conflicts with teacher2)
-        $payload = $this->payload($section, $subject, $teacher1, $room);
+        // Try to update to Monday 08:00-09:00 under teacher2 (who already has that slot),
+        // in a different section/room than teacher2's schedule, so only the teacher
+        // conflict check can fire (not section or room).
+        $payload = $this->payload($section2, $subject, $teacher2, $room2);
+        $payload['day_of_week'] = 'Monday';
+        $payload['start_time'] = '08:00';
+        $payload['end_time'] = '09:00';
 
         $response = $this->actingAs($admin)->put("/admin/schedule/{$schedule->schedule_id}", $payload);
 
         $response->assertRedirect();
         $response->assertSessionHasErrors('conflict');
-        $this->assertStringContainsString('Room is already booked', session('errors')->first('conflict'));
+        $this->assertStringContainsString('Teacher is already scheduled', session('errors')->first('conflict'));
     }
 
      /** @test */

@@ -20,7 +20,8 @@ class TeacherAssignmentController extends Controller
 
     public function index(Request $request): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('viewAny', Assignment::class);
+        $teacher = $request->user()->teacher;
 
         $query = Assignment::forTeacher($teacher->teacher_id)
             ->with(['schedule.subject', 'schedule.section'])
@@ -53,7 +54,8 @@ class TeacherAssignmentController extends Controller
 
     public function create(Request $request): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('create', Assignment::class);
+        $teacher = $request->user()->teacher;
         $schedules = Schedule::where('teacher_id', $teacher->teacher_id)
             ->with(['subject', 'section'])
             ->orderBy('schedule_id')
@@ -64,8 +66,8 @@ class TeacherAssignmentController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-        $data = $this->validatedAssignment($request, $teacher->teacher_id);
+        $this->authorize('create', Assignment::class);
+        $data = $this->validatedAssignment($request);
 
         Assignment::create([
             'schedule_id' => $data['schedule_id'],
@@ -80,8 +82,7 @@ class TeacherAssignmentController extends Controller
 
     public function show(Request $request, Assignment $assignment): View
     {
-        $teacher = $this->authorizedTeacher($request);
-        $this->authorizeOwnership($assignment, $teacher->teacher_id);
+        $this->authorize('view', $assignment);
 
         $assignment->load(['schedule.subject', 'schedule.section', 'comments'])
             ->loadCount([
@@ -94,8 +95,8 @@ class TeacherAssignmentController extends Controller
 
     public function edit(Request $request, Assignment $assignment): View
     {
-        $teacher = $this->authorizedTeacher($request);
-        $this->authorizeOwnership($assignment, $teacher->teacher_id);
+        $this->authorize('update', $assignment);
+        $teacher = $request->user()->teacher;
 
         $schedules = Schedule::where('teacher_id', $teacher->teacher_id)
             ->with(['subject', 'section'])
@@ -120,6 +121,7 @@ class TeacherAssignmentController extends Controller
         ]);
 
         return redirect()->route('teacher.assignments.index')->with('success', 'Assignment updated successfully.');
+
     }
 
     public function destroy(Request $request, Assignment $assignment): RedirectResponse

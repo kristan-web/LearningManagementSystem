@@ -27,7 +27,8 @@ class TeacherClassroomController extends Controller
 {
     public function classes(Request $request): View
     {
-        $teacher = $this->authorizedTeacher($request);
+        $this->authorize('viewAny', Schedule::class);
+        $teacher = $request->user()->teacher;
         $schedules = $this->schedulesFor($teacher);
 
         $studentCounts = Enrollment::whereIn('section_id', $schedules->pluck('section_id')->unique())
@@ -85,8 +86,6 @@ class TeacherClassroomController extends Controller
      */
     public function saveFinalGrades(Request $request): RedirectResponse
     {
-        $teacher = $this->authorizedTeacher($request);
-
         $data = $request->validate([
             'schedule_id' => ['required', 'integer'],
             'final_rating' => ['nullable', 'array'],
@@ -95,8 +94,11 @@ class TeacherClassroomController extends Controller
             'remarks.*' => ['nullable', Rule::in(FinalGrade::REMARKS)],
         ]);
 
-        $schedule = Schedule::where('schedule_id', $data['schedule_id'])->where('teacher_id', $teacher->teacher_id)->first();
-        abort_unless($schedule !== null, 403);
+        $this->authorize('view', \App\Models\Schedule::findOrFail($data['schedule_id']));
+
+        $schedule = Schedule::where('schedule_id', $data['schedule_id'])
+            ->where('teacher_id', $request->user()->teacher->teacher_id)
+            ->firstOrFail();
 
         $enrollments = $this->enrollmentsIn($schedule->section_id)->keyBy(fn ($e) => (int) $e->student_id);
         $book = $this->gradebook($schedule);
@@ -262,11 +264,24 @@ class TeacherClassroomController extends Controller
             ->with('success', 'Attendance saved.');
     }
 
-    private function authorizedTeacher(Request $request): Teacher
+    private function validatedFinalGrades(Request $request): array
     {
-        abort_unless($request->user()->role === 'Teacher', 403);
+        $data = $request->validate([
+            'schedule_id' => ['required', 'integer'],
+            'final_rating' => ['nullable', 'array'],
+            'final_rating.*' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'remarks' => ['nullable', 'array'],
+            'remarks.*' => ['nullable', Rule::in(FinalGrade::REMARKS)],
+        ]);
 
-        return Teacher::where('user_id', $request->user()->user_id)->firstOrFail();
+        // Verify ownership of the schedule via policy (we already authorized in the method)
+        // But we can also check here if needed, but we rely on the authorize call.
+        // However, to be safe, we can check that the schedule belongs to the teacher.
+        $schedule = Schedule::where('schedule_id', $data['schedule_id'])
+            ->where('teacher_id', $request->user()->teacher->teacher_id)
+            ->firstOrFail();
+
+        return $data;
     }
 
     /** The teacher's classes (one per schedule row), in timetable order. */
