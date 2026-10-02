@@ -8,7 +8,6 @@ use App\Models\User;
 class MaterialPolicy
 {
     /**
-    /**
      * Determine whether the user can view any materials.
      */
     public function viewAny(User $user): bool
@@ -16,7 +15,7 @@ class MaterialPolicy
         return $user->role === 'Teacher';
     }
 
-
+    /**
      * Determine whether the user can view the material.
      */
     public function view(User $user, LearningMaterial $material): bool
