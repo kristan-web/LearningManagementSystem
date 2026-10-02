@@ -102,62 +102,10 @@ class TeacherClassTest extends TestCase
         ]);
     }
 
-    public function test_teacher_sees_own_sections_and_enrolled_students(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        $section = $this->makeSection();
-        $this->linkTeacherToSection($teacher, $section);
-        $this->enrollStudent($section, 'Juan', 'Dela Cruz');
-
-        $response = $this->actingAs($user)->get('/teacher/classes');
-
-        $response->assertOk();
-        $this->assertCount(1, $response->viewData('sections'));
-        $this->assertEquals(1, $response->viewData('stats')['students']);
-        $response->assertSee('Dela Cruz, Juan');
-    }
-
-    public function test_teacher_does_not_see_students_from_sections_they_do_not_teach(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        [, $otherTeacher] = $this->makeTeacher();
-        $ownSection = $this->makeSection();
-        $otherSection = $this->makeSection();
-        $this->linkTeacherToSection($teacher, $ownSection);
-        $this->linkTeacherToSection($otherTeacher, $otherSection);
-
-        $this->enrollStudent($ownSection, 'Juan', 'Dela Cruz');
-        $this->enrollStudent($otherSection, 'Maria', 'Santos');
-
-        $response = $this->actingAs($user)->get('/teacher/classes');
-
-        $response->assertOk();
-        $this->assertCount(1, $response->viewData('sections'));
-        $response->assertSee('Dela Cruz, Juan');
-        // "Santos, Maria" still appears in the Add Student modal's full roster dropdown,
-        // so assert against the students table data rather than raw page text.
-        $this->assertCount(1, $response->viewData('students'));
-    }
-
-    public function test_section_filter_narrows_the_student_list(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        $sectionA = $this->makeSection();
-        $sectionB = $this->makeSection();
-        $this->linkTeacherToSection($teacher, $sectionA);
-        $this->linkTeacherToSection($teacher, $sectionB);
-
-        $this->enrollStudent($sectionA, 'Juan', 'Dela Cruz');
-        $this->enrollStudent($sectionB, 'Maria', 'Santos');
-
-        $response = $this->actingAs($user)->get('/teacher/classes?section_id=' . $sectionA->section_id);
-
-        $response->assertOk();
-        $response->assertSee('Dela Cruz, Juan');
-        // "Santos, Maria" still appears in the Add Student modal's full roster dropdown,
-        // so assert against the students table data rather than raw page text.
-        $this->assertCount(1, $response->viewData('students'));
-    }
+    // Note: "My Classes" page rendering (GET /teacher/classes) is covered by
+    // TeacherClassroomTest — this file only covers TeacherClassController::store(),
+    // the "Add Student" POST handler, which is the only route this controller
+    // still serves (see BUG_REPORT.md section 0a).
 
     public function test_non_teacher_role_is_forbidden_from_teacher_classes(): void
     {

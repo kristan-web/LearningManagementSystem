@@ -41,18 +41,20 @@ class AdminScheduleController extends Controller
         return redirect()->route('admin.schedule.index')->with('success','Schedule period created successfully.');
     }
 
-    public function update(Request $request, Schedule $schedule): RedirectResponse
+    public function update(Request $request, int $schedule_id): RedirectResponse
     {
         abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $schedule = Schedule::findOrFail($schedule_id);
         $data = $this->validateSchedule($request);
         if ($conflict = $this->detectConflict($data, $schedule->schedule_id)) return back()->withErrors(['conflict'=>$conflict])->withInput();
         $schedule->update($data);
         return redirect()->route('admin.schedule.index')->with('success','Schedule period updated successfully.');
     }
 
-    public function destroy(Request $request, Schedule $schedule): RedirectResponse
+    public function destroy(Request $request, int $schedule_id): RedirectResponse
     {
         abort_unless(in_array($request->user()->role, ['Admin', 'Staff', 'Registrar', 'Accounting'], true), 403);
+        $schedule = Schedule::findOrFail($schedule_id);
         $linked = $schedule->assignments()->count() + $schedule->quizzes()->count();
         if ($linked > 0) return back()->withErrors(['conflict'=>"This schedule period has {$linked} linked assignment(s)/quiz(zes) and cannot be deleted."]);
         $schedule->delete();

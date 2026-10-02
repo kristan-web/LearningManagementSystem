@@ -59,19 +59,6 @@ class CalendarController extends Controller
 
         $student = Student::where('user_id', $request->user()->user_id)->firstOrFail();
 
-        if ($request->user()->role === 'Admin') {
-            $event = ScheduleEvent::create([
-                ...$request->validated(),
-                'created_by_role' => 'Admin',
-                'created_by_id' => $request->user()->user_id,
-                'event_type' => 'School',
-                'status' => 'Scheduled',
-            ]);
-
-            return response()->json($event, 201);
-        }
-
-
         return response()->json($this->calendar->feedFor($student, $from, $to));
     }
 

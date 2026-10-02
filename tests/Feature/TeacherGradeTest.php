@@ -5,8 +5,6 @@ namespace Tests\Feature;
 use App\Models\Assignment;
 use App\Models\ClassSection;
 use App\Models\Enrollment;
-use App\Models\Quiz;
-use App\Models\QuizAttempt;
 use App\Models\Schedule;
 use App\Models\Strand;
 use App\Models\Student;
@@ -85,62 +83,11 @@ class TeacherGradeTest extends TestCase
         return $student;
     }
 
-    public function test_teacher_sees_grade_averages_for_own_section_students(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        $section = $this->makeSection();
-        $schedule = $this->linkTeacherToSection($teacher, $section);
-        $student = $this->enrollStudent($section, 'Juan', 'Dela Cruz');
-
-        $assignment = Assignment::create(['schedule_id' => $schedule->schedule_id, 'title' => 'HW 1', 'max_score' => 100, 'due_date' => now()->addWeek()]);
-        Submission::create(['assignment_id' => $assignment->assignment_id, 'student_id' => $student->student_id, 'score' => 80, 'status' => 'Graded']);
-
-        $quiz = Quiz::create(['schedule_id' => $schedule->schedule_id, 'title' => 'Quiz 1', 'attempts_allowed' => 1]);
-        QuizAttempt::create(['quiz_id' => $quiz->quiz_id, 'student_id' => $student->student_id, 'score' => 90, 'submitted_at' => now()]);
-
-        $response = $this->actingAs($user)->get('/teacher/grades');
-
-        $response->assertOk();
-        $response->assertSee('Dela Cruz, Juan');
-        $grades = $response->viewData('grades')[$student->student_id];
-        $this->assertEquals(80.0, $grades['assignment']);
-        $this->assertEquals(90.0, $grades['quiz']);
-        $this->assertEquals(85.0, $grades['overall']);
-    }
-
-    public function test_search_filter_narrows_the_grade_book(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        $section = $this->makeSection();
-        $this->linkTeacherToSection($teacher, $section);
-        $this->enrollStudent($section, 'Juan', 'Dela Cruz');
-        $this->enrollStudent($section, 'Maria', 'Santos');
-
-        $response = $this->actingAs($user)->get('/teacher/grades?search=Santos');
-
-        $response->assertOk();
-        $response->assertSee('Santos, Maria');
-        $response->assertDontSee('Dela Cruz, Juan');
-    }
-
-    public function test_teacher_does_not_see_grades_for_students_outside_their_sections(): void
-    {
-        [$user, $teacher] = $this->makeTeacher();
-        [, $otherTeacher] = $this->makeTeacher();
-        $ownSection = $this->makeSection();
-        $otherSection = $this->makeSection();
-        $this->linkTeacherToSection($teacher, $ownSection);
-        $this->linkTeacherToSection($otherTeacher, $otherSection);
-
-        $this->enrollStudent($ownSection, 'Juan', 'Dela Cruz');
-        $this->enrollStudent($otherSection, 'Maria', 'Santos');
-
-        $response = $this->actingAs($user)->get('/teacher/grades');
-
-        $response->assertOk();
-        $response->assertSee('Dela Cruz, Juan');
-        $response->assertDontSee('Santos, Maria');
-    }
+    // Note: "Grades & Records" page rendering (GET /teacher/grades, including
+    // search/section filtering and per-student averages) is covered by
+    // TeacherClassroomTest — this file only covers TeacherGradeController::show(),
+    // the per-student grade detail page, which is the only route this controller
+    // still serves (see BUG_REPORT.md section 0a).
 
     public function test_non_teacher_role_is_forbidden_from_teacher_grades(): void
     {
