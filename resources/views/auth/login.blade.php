@@ -24,11 +24,6 @@
 
         /* Background decoration */
         .login-bg { background: #fff; }
-        .cloud {
-            position: absolute; height: auto;
-            
-            animation: bg-drift 30s ease-in-out infinite alternate;
-        }
         .bg-dots {
             background-image: radial-gradient(rgba(100, 116, 139, .18) 1px, transparent 1px);
             background-size: 22px 22px;
@@ -36,12 +31,6 @@
             mask-image: radial-gradient(ellipse at center, #000 25%, transparent 75%);
         }
         .bg-glow { background: radial-gradient(ellipse 38% 45% at 50% 50%, rgba(255, 255, 255, .9), rgba(255, 255, 255, .6) 35%, rgba(241, 245, 249, .35) 55%, transparent 70%); }
-        @keyframes bg-drift {
-            to { transform: translateX(60px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .cloud { animation: none; }
-        }
 
         /* Owl mascot */
         .owl { overflow: visible; -webkit-tap-highlight-color: transparent; }
@@ -143,36 +132,6 @@
 <body class="login-bg min-h-screen font-jakarta text-ink antialiased selection:bg-gold/30">
     {{-- Decorative background --}}
     <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        {{-- Realistic clouds: soft shapes roughened by fractal noise, bluish underside peeks below --}}
-        <svg width="0" height="0" style="position: absolute">
-            <defs>
-                <filter id="cloud-f1" x="-30%" y="-50%" width="160%" height="200%">
-                    <feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="5" seed="3"/>
-                    <feDisplacementMap in="SourceGraphic" scale="110" xChannelSelector="R" yChannelSelector="G"/>
-                    <feGaussianBlur stdDeviation="18"/>
-                </filter>
-                <filter id="cloud-f2" x="-30%" y="-50%" width="160%" height="200%">
-                    <feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="5" seed="11"/>
-                    <feDisplacementMap in="SourceGraphic" scale="110" xChannelSelector="R" yChannelSelector="G"/>
-                    <feGaussianBlur stdDeviation="18"/>
-                </filter>
-                <filter id="cloud-f3" x="-30%" y="-50%" width="160%" height="200%">
-                    <feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="5" seed="27"/>
-                    <feDisplacementMap in="SourceGraphic" scale="110" xChannelSelector="R" yChannelSelector="G"/>
-                    <feGaussianBlur stdDeviation="18"/>
-                </filter>
-                <g id="cloud-shape">
-                    <ellipse cx="300" cy="180" rx="220" ry="55"/>
-                    <ellipse cx="220" cy="140" rx="110" ry="70"/>
-                    <ellipse cx="350" cy="120" rx="135" ry="85"/>
-                    <ellipse cx="460" cy="160" rx="90" ry="55"/>
-                </g>
-            </defs>
-        </svg>
-        <svg class="cloud" viewBox="0 0 600 300" style="top: 4%; left: -6%; width: 30rem"><use href="#cloud-shape" fill="#bfdbfe" opacity=".35" filter="url(#cloud-f1)" transform="translate(0 18)"/><use href="#cloud-shape" fill="#e0f2fe" opacity=".7" filter="url(#cloud-f1)"/></svg>
-        <svg class="cloud" viewBox="0 0 600 300" style="top: 36%; right: -8%; width: 34rem; animation-delay: -10s"><use href="#cloud-shape" fill="#bfdbfe" opacity=".35" filter="url(#cloud-f2)" transform="translate(0 18)"/><use href="#cloud-shape" fill="#e0f2fe" opacity=".7" filter="url(#cloud-f2)"/></svg>
-        <svg class="cloud" viewBox="0 0 600 300" style="bottom: 2%; left: 16%; width: 26rem; animation-delay: -20s"><use href="#cloud-shape" fill="#bfdbfe" opacity=".35" filter="url(#cloud-f3)" transform="translate(0 18)"/><use href="#cloud-shape" fill="#e0f2fe" opacity=".7" filter="url(#cloud-f3)"/></svg>
-        <svg class="cloud" viewBox="0 0 600 300" style="top: 10%; right: 24%; width: 14rem; opacity: .75; animation-delay: -5s"><use href="#cloud-shape" fill="#bfdbfe" opacity=".35" filter="url(#cloud-f2)" transform="translate(0 18)"/><use href="#cloud-shape" fill="#e0f2fe" opacity=".7" filter="url(#cloud-f2)"/></svg>
         <div class="bg-dots absolute inset-0"></div>
         <div class="bg-glow absolute inset-0"></div>
     </div>

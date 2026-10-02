@@ -1,4 +1,4 @@
-{{-- Admin: Support (contact channels + ticket form; UI only, the form is not yet wired to a backend) --}}
+{{-- Admin: Support (contact channels + request form posting to SupportRequestController@store) --}}
 @extends('layouts.admin')
 @section('title', 'Support')
 
@@ -38,24 +38,31 @@
 <div class="mx-auto w-full max-w-6xl space-y-6 pt-8">
 
     {{-- Page header --}}
-    <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold text-ink dark:text-white">Support</h1>
-        <p class="text-sm text-ink/60 dark:text-slate-400">Get help from the IT team or send a support request.</p>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div class="flex flex-col gap-1">
+            <h1 class="text-2xl font-bold text-ink dark:text-white">Support</h1>
+            <p class="text-sm text-ink/60 dark:text-slate-400">Get help from the IT team or send a support request.</p>
+        </div>
+        <a href="{{ route('admin.support.requests') }}" class="btn-navy">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4"/></svg>
+            Support Requests
+        </a>
     </div>
 
     {{-- Hero --}}
-    <section class="relative overflow-hidden rounded-2xl bg-linear-to-r from-sky-400 via-blue-500 to-indigo-500 px-6 py-6 text-white shadow-lg shadow-blue-500/20">
+    <section class="bg-navy relative overflow-hidden rounded-2xl px-6 py-6 text-white shadow-[0_14px_32px_-14px_rgb(22_36_79/0.55)]">
         <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-lg font-semibold">Need a quick answer?</h2>
-                <p class="mt-1 text-sm text-blue-50">Most questions are covered by the step-by-step guides.</p>
+                <h2 class="font-display text-lg font-bold">Need a quick answer?</h2>
+                <p class="mt-1 text-sm text-white/70">Most questions are covered by the step-by-step guides.</p>
             </div>
-            <a href="{{ route('admin.documentation') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-brand-deep shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <a href="{{ route('admin.documentation') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ink shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4"/></svg>
                 Browse Documentation
             </a>
         </div>
-        <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10"></div>
+        <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5"></div>
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-linear-to-r from-transparent via-gold to-transparent opacity-70"></div>
     </section>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -117,7 +124,7 @@
 
         {{-- Right column: support request form --}}
         <div class="lg:col-span-2">
-            <section class="{{ $card }}" x-data="{ sent: false, message: '' }">
+            <section class="{{ $card }}" x-data="{ message: @js(old('message', '')) }">
                 <div class="{{ $cardHead }}">
                     <span class="{{ $cardIcon }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-5l-5 5v-5Z"/></svg>
@@ -128,21 +135,16 @@
                     </div>
                 </div>
 
-                {{-- Success state --}}
-                <div x-show="sent" x-cloak x-transition.opacity class="flex flex-col items-center px-6 py-14 text-center">
-                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300">
-                        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    </span>
-                    <h4 class="mt-4 text-base font-semibold text-ink dark:text-white">Request sent</h4>
-                    <p class="mt-1 max-w-sm text-sm text-ink/60 dark:text-slate-400">We will reply to {{ $user->email }} as soon as possible.</p>
-                    <button type="button" @click="sent = false; message = ''; $nextTick(() => $refs.form.reset())"
-                            class="mt-5 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-ink/80 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
-                        Send another request
-                    </button>
-                </div>
-
-                {{-- TODO: point action at a real route once support tickets have a backend. --}}
-                <form x-ref="form" x-show="!sent" @submit.prevent="sent = true" class="grid grid-cols-1 gap-5 px-6 py-5 sm:grid-cols-2">
+                <form method="POST" action="{{ route('support-requests.store') }}" enctype="multipart/form-data" class="grid grid-cols-1 gap-5 px-6 py-5 sm:grid-cols-2"
+                      data-confirm="Send this request?" data-confirm-text="It will appear under Support Requests." data-confirm-button="Send request">
+                    @csrf
+                    @if ($errors->any())
+                        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:col-span-2 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
                     <div>
                         <label for="support_name" class="{{ $label }}">Name</label>
                         <input type="text" id="support_name" value="{{ trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: $user->name }}" class="{{ $readonly }}" readonly>
@@ -154,9 +156,9 @@
                     <div class="sm:col-span-2">
                         <label for="category" class="{{ $label }}">Category <span class="{{ $req }}">*</span></label>
                         <select id="category" name="category" required class="{{ $input }}">
-                            <option value="" disabled selected>Select a category</option>
+                            <option value="" disabled @selected(! old('category'))>Select a category</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category }}">{{ $category }}</option>
+                                <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -165,7 +167,7 @@
                         <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
                             @foreach ($priorities as $priority => $checked)
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="priority" value="{{ $priority }}" class="peer sr-only" {{ $priority === 'Normal' ? 'checked' : '' }}>
+                                    <input type="radio" name="priority" value="{{ $priority }}" class="peer sr-only" @checked(old('priority', 'Normal') === $priority)>
                                     <span class="flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-ink/70 transition hover:border-brand/40 peer-focus-visible:ring-3 peer-focus-visible:ring-brand/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 {{ $checked }}">{{ $priority }}</span>
                                 </label>
                             @endforeach
@@ -173,7 +175,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label for="subject" class="{{ $label }}">Subject <span class="{{ $req }}">*</span></label>
-                        <input type="text" id="subject" name="subject" maxlength="120" required class="{{ $input }}" placeholder="Short summary of the issue">
+                        <input type="text" id="subject" name="subject" maxlength="120" required class="{{ $input }}" placeholder="Short summary of the issue" value="{{ old('subject') }}">
                     </div>
                     <div class="sm:col-span-2">
                         <label for="message" class="{{ $label }}">Message <span class="{{ $req }}">*</span></label>
@@ -187,7 +189,7 @@
                         <label for="attachment" class="{{ $label }}">Screenshot</label>
                         <input type="file" id="attachment" name="attachment" accept="image/*"
                                class="block w-full text-sm text-ink/60 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-deep hover:file:bg-blue-100 dark:text-slate-400 dark:file:bg-blue-500/15 dark:file:text-blue-300">
-                        <p class="{{ $hint }}">Optional. PNG or JPG.</p>
+                        <p class="{{ $hint }}">Optional. PNG or JPG, up to 5 MB.</p>
                     </div>
                     <div class="flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end">
                         <button type="reset" @click="message = ''" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-ink/80 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Clear</button>

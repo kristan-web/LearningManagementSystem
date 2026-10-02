@@ -4,23 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/** Table from 2026_09_20_000019: one row per student per class period per day (unique), logged by a user. */
 class AttendanceRecord extends Model
 {
+    public const STATUSES = ['Present', 'Late', 'Absent', 'Excused'];
+
     protected $table = 'attendance_records';
     protected $primaryKey = 'attendance_id';
-
-    // The attendance_records table only has logged_at (DB default CURRENT_TIMESTAMP).
     public $timestamps = false;
 
-    /** Statuses a teacher can mark from the attendance sheet. */
-    public const STATUSES = ['Present', 'Late', 'Absent'];
+    // attendance_date stays a plain 'Y-m-d' string (no date cast) so lookups match the stored value on MySQL and SQLite alike.
+    protected $fillable = ['schedule_id', 'student_id', 'attendance_date', 'status', 'remarks', 'logged_by', 'logged_at'];
 
-    protected $fillable = [
-        'schedule_id', 'student_id', 'attendance_date', 'status', 'logged_by',
-    ];
-
-    // attendance_date is kept as a plain 'Y-m-d' string (not cast to Carbon) so that
-    // query matching in updateOrCreate() stays consistent with the stored value.
     protected $casts = [
         'logged_at' => 'datetime',
     ];
@@ -37,6 +32,6 @@ class AttendanceRecord extends Model
 
     public function loggedBy()
     {
-        return $this->belongsTo(User::class, 'logged_by', 'user_id');
+        return $this->belongsTo(User::class, 'logged_by');
     }
 }

@@ -20,7 +20,9 @@ class ProfileController extends Controller
         $teacher = $user->role === 'Teacher' ? Teacher::where('user_id', $user->user_id)->first() : null;
         $student = $user->role === 'Student' ? Student::where('user_id', $user->user_id)->first() : null;
 
-        return view('profile.edit', compact('user', 'teacher', 'student'));
+        $view = $user->role === 'Student' ? 'student.profile.edit' : 'profile.edit';
+
+        return view($view, compact('user', 'teacher', 'student'));
     }
 
     /** Update contact/personal details only — name, email, role, status and IDs can't be changed here. */

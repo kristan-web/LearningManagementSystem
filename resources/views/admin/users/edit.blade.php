@@ -360,7 +360,7 @@
                     <div class="form-group">
                         <label for="password">Password (Leave blank to keep current)</label>
                         <div class="password-wrapper">
-                            <input type="password" id="password" name="password" minlength="8" placeholder="Enter new password (optional)">
+                            <input type="password" autocomplete="new-password" id="password" name="password" minlength="8" placeholder="Enter new password (optional)">
                             <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
                                 <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.522 3 12 3s8.268 4.943 9.542 9c-1.274 4.057-5.064 9-9.542 9S3.732 16.057 2.458 12z" /></svg>
                                 <svg class="w-5 h-5 eye-close" fill="none" stroke="currentColor" viewbox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l5.858 5.858M9.878 9.878L3 3m6.878 6.878L21 21" /></svg>
@@ -377,7 +377,7 @@
                     <div class="form-group">
                         <label for="password_confirmation">Confirm Password</label>
                         <div class="confirm-password-wrapper">
-                            <input type="password" id="password_confirmation" name="password_confirmation" minlength="8" placeholder="Confirm new password">
+                            <input type="password" autocomplete="new-password" id="password_confirmation" name="password_confirmation" minlength="8" placeholder="Confirm new password">
                             <button type="button" class="confirm-password-toggle" id="confirmPasswordToggle" aria-label="Toggle confirm password visibility">
                                 <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.522 3 12 3s8.268 4.943 9.542 9c-1.274 4.057-5.064 9-9.542 9S3.732 16.057 2.458 12z" /></svg>
                                 <svg class="w-5 h-5 eye-close" fill="none" stroke="currentColor" viewbox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l5.858 5.858M9.878 9.878L3 3m6.878 6.878L21 21" /></svg>
